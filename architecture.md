@@ -41,6 +41,116 @@ my-ai-claims-app/
 
 ***
 
+## AI & Machine Learning Components
+
+### AI Service Architecture
+```plaintext
+src/
+├── ai/                      # AI/ML service layer
+│   ├── models/              # AI model configurations and wrappers
+│   │   ├── claimClassifier.ts   # Claim type classification
+│   │   ├── fraudDetection.ts    # Fraud scoring models
+│   │   └── documentExtraction.ts # OCR and data extraction
+│   ├── services/            # AI service orchestration
+│   │   ├── claimProcessor.ts    # Main AI processing pipeline
+│   │   ├── riskAssessment.ts    # Risk scoring and evaluation
+│   │   └── automatedDecision.ts # Decision engine with human-in-loop
+│   ├── workflows/           # Multi-step AI workflows
+│   │   ├── claimIntake.ts       # Automated claim intake workflow
+│   │   ├── documentAnalysis.ts  # Document processing workflow
+│   │   └── approvalWorkflow.ts  # Automated approval chains
+│   └── config/              # AI model configurations
+│       ├── modelEndpoints.ts    # External AI API configurations
+│       └── confidenceThresholds.ts # Decision confidence levels
+```
+
+### Integration Strategy
+- **External AI APIs:** OpenAI GPT-4, Google Document AI, AWS Textract
+- **Human-in-the-Loop:** Automated decisions with confidence thresholds
+- **Model Training:** Continuous improvement with customer feedback
+- **Fallback Systems:** Rule-based processing when AI confidence is low
+
+***
+
+## Security & Compliance Architecture
+
+### Data Security
+```plaintext
+src/
+├── security/                # Security implementation layer
+│   ├── encryption/          # Data encryption utilities
+│   │   ├── fieldEncryption.ts   # Database field-level encryption
+│   │   └── fileEncryption.ts    # Document encryption at rest
+│   ├── audit/               # Audit logging and compliance
+│   │   ├── auditLogger.ts       # Comprehensive audit trails
+│   │   ├── complianceReports.ts # GDPR/SOC2 compliance reporting
+│   │   └── accessLogs.ts        # User access and action logging
+│   ├── validation/          # Input validation and sanitization
+│   │   ├── claimValidation.ts   # Business rule validation
+│   │   └── inputSanitization.ts # XSS and injection prevention
+│   └── rbac/                # Role-based access control
+│       ├── permissions.ts       # Permission definitions
+│       └── roleAssignment.ts    # User role management
+```
+
+### Compliance Features
+- **GDPR Compliance:** Data portability, right to deletion, consent management
+- **SOC 2 Type II:** Security controls and audit logging
+- **HIPAA Ready:** Healthcare insurance claim processing capabilities
+- **PCI DSS:** Payment information security (if handling payments)
+
+### Security Implementation
+- **Row Level Security (RLS):** Supabase-native data isolation
+- **API Rate Limiting:** DDoS protection and abuse prevention
+- **Multi-factor Authentication:** Required for admin and sensitive operations
+- **Encryption:** AES-256 for data at rest, TLS 1.3 for data in transit
+- **Vulnerability Scanning:** Automated security testing in CI/CD
+
+***
+
+## Scalability & Performance Architecture
+
+### Database Optimization
+```plaintext
+supabase/
+├── migrations/              # Database schema evolution
+│   ├── 001_initial_schema.sql   # Base tables and indexes
+│   ├── 002_audit_tables.sql     # Audit and compliance tables
+│   ├── 003_ai_metadata.sql      # AI processing metadata
+│   └── 004_performance_indexes.sql # Performance optimization
+├── functions/               # Supabase Edge Functions
+│   ├── claim-processor/         # Serverless claim processing
+│   ├── ai-orchestrator/         # AI workflow coordination
+│   └── notification-sender/     # Real-time notifications
+└── policies/                # Row Level Security policies
+    ├── claims-access.sql        # Claims data access rules
+    └── admin-access.sql         # Administrative access rules
+```
+
+### Performance Features
+- **Database Read Replicas:** High-volume query distribution
+- **CDN Implementation:** Global asset delivery
+- **Caching Strategy:** Redis for session and frequently accessed data
+- **Queue System:** Background job processing for AI workflows
+- **Microservices Ready:** Modular architecture for future scaling
+
+### Monitoring & Observability
+```plaintext
+src/
+├── monitoring/              # Application monitoring
+│   ├── metrics/            # Performance metrics collection
+│   │   ├── claimMetrics.ts     # Claim processing metrics
+│   │   └── aiMetrics.ts        # AI model performance metrics
+│   ├── alerts/             # Alerting and notification
+│   │   ├── errorAlerts.ts      # Error threshold monitoring
+│   │   └── performanceAlerts.ts # Performance degradation alerts
+│   └── analytics/          # Business intelligence
+│       ├── dashboards.ts       # Real-time dashboard data
+│       └── reporting.ts        # Automated report generation
+```
+
+***
+
 ## Folder \& File Role Breakdown
 
 - **public/** \& **styles/**
