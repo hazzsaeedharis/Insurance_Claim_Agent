@@ -4,9 +4,9 @@
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/hazzsaeedharis/claimai-pro)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
-[![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)](https://typescriptlang.org)
+[![JavaScript](https://img.shields.io/badge/javascript-ES6+-yellow.svg)](https://javascript.info)
 [![FastAPI](https://img.shields.io/badge/fastapi-0.104+-red.svg)](https://fastapi.tiangolo.com)
-[![Next.js](https://img.shields.io/badge/next.js-14+-black.svg)](https://nextjs.org)
+[![HTML5](https://img.shields.io/badge/html5-5.0+-orange.svg)](https://html5.org)
 
 ---
 
@@ -118,7 +118,7 @@ Based on the [5 Levels of AI Agents](./documentation/agent-architecture.md), Cla
 ### Prerequisites
 
 - **Python 3.9+** (Backend)
-- **Node.js 18+** (Frontend) 
+- **Modern Web Browser** (Frontend - Chrome, Firefox, Safari, Edge)
 - **Git** (Version control)
 - **Supabase Account** (Database, optional for demo)
 - **AI Provider API Keys** (Optional for demo mode)
@@ -135,12 +135,12 @@ cd backend
 pip install -r requirements.txt
 python main.py
 
-# Start frontend (New terminal)
+# Start frontend (Simple - just open in browser)
 cd frontend
-npm install
-npm run dev
-
-# Open browser: http://localhost:3000
+# Open index.html in any modern web browser
+# Or use a simple HTTP server:
+python -m http.server 8080
+# Then open: http://localhost:8080
 ```
 
 🎉 **That's it!** The demo mode works without any API keys or database setup.
@@ -159,23 +159,21 @@ ClaimAI-Pro/
 │   ├── user-journey.md        # User workflows & requirements
 │   └── tasks.md               # Development roadmap
 │
-├── 🐍 backend/                 # Python FastAPI backend
-│   ├── app/                   # Application code
-│   │   ├── services/          # AI services & orchestration
-│   │   ├── routers/           # API endpoints
-│   │   ├── models/            # Data models & schemas
-│   │   └── config.py          # Configuration management
+├── 🐍 backend/                 # Python FastAPI backend (FLAT)
 │   ├── main.py                # FastAPI application entry
-│   └── requirements.txt       # Python dependencies
+│   ├── requirements.txt       # Python dependencies
+│   ├── config.py              # Configuration management
+│   ├── ai_service.py          # Multi-provider AI integration
+│   ├── claim_orchestrator.py  # Core business logic
+│   ├── schemas.py             # Pydantic data models
+│   ├── claims.py              # Claims API routes
+│   ├── ai.py                  # AI processing routes
+│   └── dashboard.py           # Dashboard & analytics routes
 │
-├── ⚛️ frontend/                # Next.js TypeScript frontend
-│   ├── src/                   # Source code
-│   │   ├── app/               # Next.js 14 app router
-│   │   ├── components/        # Reusable UI components
-│   │   ├── lib/               # Utilities & API clients
-│   │   └── types/             # TypeScript definitions
-│   ├── package.json           # Node.js dependencies
-│   └── next.config.js         # Next.js configuration
+├── ⚛️ frontend/                # Simple HTML/CSS/JS frontend (FLAT)
+│   ├── index.html             # Main dashboard page
+│   ├── main.css               # All styles
+│   └── app.js                 # All JavaScript functionality
 │
 ├── 🗄️ database/               # Database schemas & migrations
 │   └── supabase/              # Supabase configurations
@@ -209,19 +207,16 @@ cp env.example .env
 # DEMO_MODE=true works without any API keys!
 ```
 
-### Frontend Setup (Node.js)
+### Frontend Setup (Simple HTML/CSS/JS)
 
 ```bash
 cd frontend
 
-# Install dependencies
-npm install
+# No installation needed! Just open in browser
+# Or use a simple HTTP server:
+python -m http.server 8080
 
-# Copy environment configuration  
-cp .env.example .env.local
-
-# Edit .env.local with backend URL
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000" >> .env.local
+# Open in browser: http://localhost:8080
 ```
 
 ### Database Setup (Optional)
@@ -251,9 +246,10 @@ python main.py
 
 **Terminal 2 - Frontend:**
 ```bash
-cd frontend  
-npm run dev
-# ⚛️ Frontend running on http://localhost:3000
+cd frontend
+# Open index.html in browser or use HTTP server:
+python -m http.server 8080
+# ⚛️ Frontend running on http://localhost:8080
 ```
 
 ### Production Mode
@@ -265,7 +261,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 # Frontend
 cd frontend
-npm run build && npm start
+# Just serve the static files:
+python -m http.server 8080
 ```
 
 ### Docker Development (Optional)
