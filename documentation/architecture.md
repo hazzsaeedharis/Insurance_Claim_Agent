@@ -3,39 +3,49 @@
 ## File \& Folder Structure
 
 ```plaintext
-my-ai-claims-app/
-│── public/                   # Static assets (logos, claim artifacts, images)
-│── src/
-│   ├── app/                  # Next.js App Router directory (pages, layouts, nested routing)
-│   │    ├── page.tsx         # Main app entry (dashboard or landing)
-│   │    ├── claims/          # Claims feature pages/routes
-│   │    │   ├── page.tsx     # Claims list/overview
-│   │    │   ├── [id]/        # Dynamic route for single claim details
-│   │    │   │    └── page.tsx
-│   │    ├── auth/            # Auth routes (login, register, reset password, etc.)
-│   │    │   ├── login/page.tsx
-│   │    │   └── register/page.tsx
-│   │    └── admin/           # Admin dashboard for audits, overrides
-│   ├── components/           # Reusable UI components (Buttons, Cards, Inputs, etc.)
-│   ├── layouts/              # App layout components (Header, Sidebar, Footer)
-│   ├── styles/               # Global/app-level styles (CSS, SCSS, Tailwind)
-│   ├── hooks/                # Custom React hooks (e.g., useClaimForm, useAuth)
-│   ├── context/              # React context for global app state (auth, user, claims context)
-│   ├── services/             # API interface to Supabase (data access, mutation, authentication)
-│   │   ├── supabaseClient.ts # Supabase setup and shared client
-│   │   ├── claims.ts         # Claims-specific data services (CRUD, workflow)
-│   │   └── users.ts          # User profile and account fetch/update
-│   ├── middleware/           # Route guards, authentication/authorization logic
-│   ├── utils/                # Utility functions & helpers (e.g., validators, data transformation)
-│   ├── constants/            # Static constants (roles, status codes, policy types)
-│   ├── store/                # State management library (Zustand, Redux, or native context)
-│   └── config/               # Environment/configuration (API keys, endpoints, feature toggles)
-│── .env.local                # Supabase keys & secrets
-│── next.config.js            # Next.js configuration
-│── package.json              # Project metadata and dependencies
-│── README.md                 # Documentation
-│── tsconfig.json             # TypeScript configuration
+Insurance_Claim_Agent/                    # 🏠 Root directory (FLAT STRUCTURE)
+├── 📚 documentation/                     # 📋 All documentation organized
+│   ├── business-strategy.md              # Market analysis & business model
+│   ├── architecture.md                  # Technical architecture
+│   ├── agent-architecture.md             # AI agent implementation
+│   ├── cost-analysis-gtm.md             # Pricing & go-to-market
+│   ├── user-journey.md                   # User workflows & requirements
+│   └── tasks.md                          # Development roadmap
+│
+├── 🐍 backend/                           # Python FastAPI backend (FLAT)
+│   ├── main.py                          # FastAPI application entry
+│   ├── requirements.txt                 # Python dependencies
+│   ├── config.py                        # Configuration management
+│   ├── ai_service.py                    # Multi-provider AI integration
+│   ├── claim_orchestrator.py            # Core business logic
+│   ├── schemas.py                        # Pydantic data models
+│   ├── claims.py                         # Claims API routes
+│   ├── ai.py                            # AI processing routes
+│   └── dashboard.py                     # Dashboard & analytics routes
+│
+├── ⚛️ frontend/                          # Simple HTML/CSS/JS frontend (FLAT)
+│   ├── index.html                       # Main dashboard page
+│   ├── main.css                         # All styles
+│   └── app.js                           # All JavaScript functionality
+│
+├── 🗄️ database/                          # Database schemas & migrations
+│   └── supabase/                        # Supabase configurations
+│       └── migrations/                  # SQL migration files
+│           └── 001_initial_schema.sql
+│
+├── 📖 README.md                          # Comprehensive setup guide
+├── 🔧 env.example                        # Environment configuration template
+└── 📄 LICENSE                            # MIT License
 ```
+
+### 🎯 **FLAT STRUCTURE BENEFITS**
+
+- ✅ **No nested folders** - Everything at root level
+- ✅ **Easy navigation** - All files visible immediately  
+- ✅ **Faster development** - No folder hunting
+- ✅ **Simpler deployment** - Just copy files
+- ✅ **Perfect for MVP** - Focus on functionality, not organization
+- ✅ **Easy to understand** - New developers can see everything
 
 [source: dev.to][^2][^1]
 

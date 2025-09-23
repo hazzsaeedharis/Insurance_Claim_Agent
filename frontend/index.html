@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaimAI Pro - AI-Powered Insurance Claims Processing</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🚀 ClaimAI Pro</h1>
+                    <p>AI-Powered Insurance Claims Processing</p>
+                </div>
+                <div class="header-actions">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span>System Operational</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Stats Overview -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="total-claims">1,247</h3>
+                            <p>Total Claims</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="pending-claims">23</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 id="approved-claims">1,156</h3>
+                            <p>Approved</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <h3 id="rejected-claims">68</h3>
+                            <p>Rejected</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Grid -->
+            <section class="dashboard-grid">
+                <!-- Claims Overview -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>📋 Claims Overview</h2>
+                        <button class="btn btn-primary" onclick="refreshClaims()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="claims-list" id="claims-list">
+                            <!-- Claims will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Processing Stats -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>🤖 AI Processing</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="ai-stats">
+                            <div class="ai-stat">
+                                <span class="ai-label">Processing Speed:</span>
+                                <span class="ai-value">2.3 seconds avg</span>
+                            </div>
+                            <div class="ai-stat">
+                                <span class="ai-label">AI Accuracy:</span>
+                                <span class="ai-value">95%</span>
+                            </div>
+                            <div class="ai-stat">
+                                <span class="ai-label">Fraud Detection:</span>
+                                <span class="ai-value">94%</span>
+                            </div>
+                            <div class="ai-stat">
+                                <span class="ai-label">System Uptime:</span>
+                                <span class="ai-value">99.97%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>⚡ Quick Actions</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="action-buttons">
+                            <button class="btn btn-success" onclick="createNewClaim()">
+                                <i class="fas fa-plus"></i> New Claim
+                            </button>
+                            <button class="btn btn-info" onclick="runAIDemo()">
+                                <i class="fas fa-robot"></i> AI Demo
+                            </button>
+                            <button class="btn btn-warning" onclick="viewAnalytics()">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </button>
+                            <button class="btn btn-secondary" onclick="openAdmin()">
+                                <i class="fas fa-cog"></i> Admin Panel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>🕒 Recent Activity</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activity will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Demo Section -->
+            <section class="demo-section">
+                <div class="demo-card">
+                    <h2>🤖 AI Processing Demo</h2>
+                    <p>Experience the power of AI-driven claims processing</p>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary btn-large" onclick="runAIDemo()">
+                            <i class="fas fa-play"></i> Try AI Demo
+                        </button>
+                        <button class="btn btn-secondary" onclick="openAPIDocs()">
+                            <i class="fas fa-book"></i> API Documentation
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ClaimAI Pro. All rights reserved.</p>
+            <p>Built with ❤️ for the future of insurance claims processing</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading ClaimAI Pro...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/app.js"></script>
+</body>
+</html>
