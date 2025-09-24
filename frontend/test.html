@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaimAI Pro - Test Suite</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .test-section h2 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .test-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .test-card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-button.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .test-button.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .test-result.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .test-result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .test-result.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .demo-data {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-link {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 ClaimAI Pro Test Suite</h1>
+            <p>Comprehensive testing and demo data generation</p>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-server"></i> Backend Connection Tests</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>Health Check</h3>
+                    <button class="test-button" onclick="testBackendHealth()">Test Backend Health</button>
+                    <div id="health-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>API Endpoints</h3>
+                    <button class="test-button" onclick="testAPIEndpoints()">Test All Endpoints</button>
+                    <div id="api-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>AI Demo</h3>
+                    <button class="test-button" onclick="testAIDemo()">Test AI Processing</button>
+                    <div id="ai-result" class="test-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-chart-bar"></i> Dashboard Data Tests</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>Dashboard Stats</h3>
+                    <button class="test-button" onclick="testDashboardStats()">Test Statistics</button>
+                    <div id="stats-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>Processing Metrics</h3>
+                    <button class="test-button" onclick="testProcessingMetrics()">Test Metrics</button>
+                    <div id="metrics-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>Recent Claims</h3>
+                    <button class="test-button" onclick="testRecentClaims()">Test Claims Data</button>
+                    <div id="claims-result" class="test-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-robot"></i> AI Processing Tests</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>AI Providers</h3>
+                    <button class="test-button" onclick="testAIProviders()">Test AI Providers</button>
+                    <div id="providers-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>Fraud Detection</h3>
+                    <button class="test-button" onclick="testFraudDetection()">Test Fraud Detection</button>
+                    <div id="fraud-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>Document Analysis</h3>
+                    <button class="test-button" onclick="testDocumentAnalysis()">Test Document Analysis</button>
+                    <div id="document-result" class="test-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-database"></i> Demo Data Generation</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>Generate Demo Claims</h3>
+                    <button class="test-button" onclick="generateDemoClaims()">Generate Sample Data</button>
+                    <div id="demo-result" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>Demo Presentation</h3>
+                    <button class="test-button" onclick="showDemoPresentation()">Show Presentation Data</button>
+                    <div id="presentation-result" class="test-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-external-link-alt"></i> Quick Links</h2>
+            <div class="quick-links">
+                <a href="http://localhost:8000/docs" target="_blank" class="quick-link">
+                    <i class="fas fa-book"></i> API Documentation
+                </a>
+                <a href="http://localhost:8000/api/ai/demo" target="_blank" class="quick-link">
+                    <i class="fas fa-robot"></i> AI Demo API
+                </a>
+                <a href="http://localhost:8000/api/dashboard/stats" target="_blank" class="quick-link">
+                    <i class="fas fa-chart-bar"></i> Dashboard Stats
+                </a>
+                <a href="index.html" class="quick-link">
+                    <i class="fas fa-home"></i> Main Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+
+        async function makeRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                const result = await response.json();
+                return { success: response.ok, data: result, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function showResult(containerId, message, isSuccess = true, data = null) {
+            const container = document.getElementById(containerId);
+            container.textContent = message;
+            container.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            container.style.display = 'block';
+            
+            if (data) {
+                const dataDiv = document.createElement('div');
+                dataDiv.className = 'demo-data';
+                dataDiv.textContent = JSON.stringify(data, null, 2);
+                container.appendChild(dataDiv);
+            }
+        }
+
+        async function testBackendHealth() {
+            const result = await makeRequest('/health');
+            if (result.success) {
+                showResult('health-result', '✅ Backend is healthy and running!', true, result.data);
+            } else {
+                showResult('health-result', `❌ Backend health check failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testAPIEndpoints() {
+            const endpoints = [
+                '/',
+                '/health',
+                '/api/dashboard/stats',
+                '/api/dashboard/metrics',
+                '/api/claims/',
+                '/api/ai/demo',
+                '/api/ai/health',
+                '/api/ai/providers'
+            ];
+
+            let successCount = 0;
+            let totalCount = endpoints.length;
+
+            for (const endpoint of endpoints) {
+                const result = await makeRequest(endpoint);
+                if (result.success) {
+                    successCount++;
+                }
+            }
+
+            const message = `API Endpoints Test: ${successCount}/${totalCount} passed`;
+            showResult('api-result', message, successCount === totalCount);
+        }
+
+        async function testAIDemo() {
+            const result = await makeRequest('/api/ai/demo');
+            if (result.success) {
+                showResult('ai-result', '✅ AI Demo endpoint working!', true, result.data);
+            } else {
+                showResult('ai-result', `❌ AI Demo failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testDashboardStats() {
+            const result = await makeRequest('/api/dashboard/stats');
+            if (result.success) {
+                showResult('stats-result', '✅ Dashboard stats loaded successfully!', true, result.data);
+            } else {
+                showResult('stats-result', `❌ Dashboard stats failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testProcessingMetrics() {
+            const result = await makeRequest('/api/dashboard/metrics');
+            if (result.success) {
+                showResult('metrics-result', '✅ Processing metrics loaded successfully!', true, result.data);
+            } else {
+                showResult('metrics-result', `❌ Processing metrics failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testRecentClaims() {
+            const result = await makeRequest('/api/dashboard/recent-claims');
+            if (result.success) {
+                showResult('claims-result', '✅ Recent claims loaded successfully!', true, result.data);
+            } else {
+                showResult('claims-result', `❌ Recent claims failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testAIProviders() {
+            const result = await makeRequest('/api/ai/providers');
+            if (result.success) {
+                showResult('providers-result', '✅ AI providers loaded successfully!', true, result.data);
+            } else {
+                showResult('providers-result', `❌ AI providers failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testFraudDetection() {
+            const testData = {
+                claim_id: "test-001",
+                claim_data: {
+                    claimant_name: "Test User",
+                    claim_amount: 5000,
+                    incident_type: "Test Incident"
+                }
+            };
+
+            const result = await makeRequest('/api/ai/fraud-detection', 'POST', testData);
+            if (result.success) {
+                showResult('fraud-result', '✅ Fraud detection test successful!', true, result.data);
+            } else {
+                showResult('fraud-result', `❌ Fraud detection failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        async function testDocumentAnalysis() {
+            const testData = {
+                claim_id: "test-001",
+                document_text: "Sample claim document for testing AI analysis",
+                document_type: "claim"
+            };
+
+            const result = await makeRequest('/api/ai/analyze', 'POST', testData);
+            if (result.success) {
+                showResult('document-result', '✅ Document analysis test successful!', true, result.data);
+            } else {
+                showResult('document-result', `❌ Document analysis failed: ${result.error || result.data}`, false);
+            }
+        }
+
+        function generateDemoClaims() {
+            const demoClaims = [
+                {
+                    id: "claim-001",
+                    claimant_name: "John Smith",
+                    policy_number: "POL-2024-001234",
+                    claim_amount: 2500.00,
+                    incident_type: "Vehicle Collision",
+                    status: "approved",
+                    processing_time: "2.3 seconds",
+                    ai_confidence: 0.92
+                },
+                {
+                    id: "claim-002",
+                    claimant_name: "Jane Doe",
+                    policy_number: "POL-2024-001235",
+                    claim_amount: 1500.00,
+                    incident_type: "Property Damage",
+                    status: "under_review",
+                    processing_time: "1.8 seconds",
+                    ai_confidence: 0.89
+                },
+                {
+                    id: "claim-003",
+                    claimant_name: "Mike Johnson",
+                    policy_number: "POL-2024-001236",
+                    claim_amount: 5000.00,
+                    incident_type: "Medical Emergency",
+                    status: "rejected",
+                    processing_time: "3.1 seconds",
+                    ai_confidence: 0.95
+                }
+            ];
+
+            showResult('demo-result', '✅ Demo claims generated successfully!', true, demoClaims);
+        }
+
+        function showDemoPresentation() {
+            const presentationData = {
+                title: "ClaimAI Pro - AI-Powered Insurance Claims Processing",
+                key_metrics: {
+                    processing_speed: "91% faster than traditional methods",
+                    accuracy: "95% AI accuracy rate",
+                    fraud_detection: "94% fraud detection rate",
+                    cost_savings: "$2.1M+ annual savings per insurer"
+                },
+                demo_scenarios: [
+                    "Standard Auto Claim - $2,500 - Approved in 2.3 seconds",
+                    "High-Value Medical Claim - $5,000 - Rejected (Fraud Risk) in 3.1 seconds",
+                    "Property Damage Claim - $1,500 - Under Review in 1.8 seconds"
+                ]
+            };
+
+            showResult('presentation-result', '✅ Demo presentation data ready!', true, presentationData);
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', function() {
+            showResult('health-result', 'Frontend test page loaded. Click buttons to test functionality.', true);
+        });
+    </script>
+</body>
+</html>
