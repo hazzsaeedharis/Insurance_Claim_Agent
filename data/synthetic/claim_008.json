@@ -1,0 +1,33 @@
+{
+  "claim_id": "CLM-7698227F",
+  "customer_id": "CUST-811928",
+  "policy_number": "POL-5142105",
+  "policy_type": "tk_statutory",
+  "items": [
+    {
+      "date": "2025-09-15",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "02100",
+      "description": "Labor Grunduntersuchung",
+      "net_amount": 31.35,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-12",
+      "provider": "Praxis Dr. Weber",
+      "code": "04110",
+      "description": "Physiotherapie",
+      "net_amount": 64.33,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-09-19T16:28:48.146844",
+  "total_claimed": 95.68,
+  "customer_info": {
+    "name": "Lisa Müller",
+    "dob": "1969-12-21",
+    "address": "Musterstraße 22, 63250 Musterstadt"
+  }
+}

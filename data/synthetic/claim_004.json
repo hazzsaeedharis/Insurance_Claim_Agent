@@ -1,0 +1,33 @@
+{
+  "claim_id": "CLM-C3A09FD8",
+  "customer_id": "CUST-963433",
+  "policy_number": "POL-7999325",
+  "policy_type": "tk_statutory",
+  "items": [
+    {
+      "date": "2025-09-14",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "04110",
+      "description": "Physiotherapie",
+      "net_amount": 53.03,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-13",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "03210",
+      "description": "Röntgen Thorax",
+      "net_amount": 71.75,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-09-18T16:28:48.144975",
+  "total_claimed": 124.78,
+  "customer_info": {
+    "name": "Lisa Schmidt",
+    "dob": "1974-02-11",
+    "address": "Musterstraße 39, 55478 Musterstadt"
+  }
+}

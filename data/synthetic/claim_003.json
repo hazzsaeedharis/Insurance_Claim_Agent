@@ -1,0 +1,33 @@
+{
+  "claim_id": "CLM-44A8A21D",
+  "customer_id": "CUST-505050",
+  "policy_number": "POL-7924261",
+  "policy_type": "hallesche_nk_select_s",
+  "items": [
+    {
+      "date": "2025-09-14",
+      "provider": "Praxis Dr. Wagner",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 27.6,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-06",
+      "provider": "Praxis Dr. Weber",
+      "code": "03210",
+      "description": "Röntgen Thorax",
+      "net_amount": 74.7,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-09-23T16:28:48.144383",
+  "total_claimed": 102.3,
+  "customer_info": {
+    "name": "Peter Wagner",
+    "dob": "1995-02-09",
+    "address": "Musterstraße 89, 59764 Musterstadt"
+  }
+}

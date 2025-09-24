@@ -1,0 +1,41 @@
+{
+  "claim_id": "CLM-0660B75D",
+  "customer_id": "CUST-801666",
+  "policy_number": "POL-2266824",
+  "policy_type": "tk_statutory",
+  "items": [
+    {
+      "date": "2025-09-12",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 67.56,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-14",
+      "provider": "Praxis Dr. Mueller",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 29.67,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-20",
+      "provider": "Praxis Dr. Becker",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 24.58,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-09-24T16:28:48.146100",
+  "total_claimed": 121.81,
+  "customer_info": {
+    "name": "Max Becker",
+    "dob": "1971-02-11",
+    "address": "Musterstraße 55, 94247 Musterstadt"
+  }
+}

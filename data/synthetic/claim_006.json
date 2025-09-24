@@ -1,0 +1,33 @@
+{
+  "claim_id": "CLM-FA494473",
+  "customer_id": "CUST-454325",
+  "policy_number": "POL-3141763",
+  "policy_type": "tk_statutory",
+  "items": [
+    {
+      "date": "2025-09-23",
+      "provider": "Praxis Dr. Weber",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 30.05,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-11",
+      "provider": "Praxis Dr. Wagner",
+      "code": "03210",
+      "description": "Röntgen Thorax",
+      "net_amount": 96.21,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-09-23T16:28:48.145710",
+  "total_claimed": 126.26,
+  "customer_info": {
+    "name": "Thomas Schmidt",
+    "dob": "1980-02-15",
+    "address": "Musterstraße 39, 63703 Musterstadt"
+  }
+}
