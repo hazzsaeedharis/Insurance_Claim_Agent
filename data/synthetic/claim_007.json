@@ -1,41 +1,41 @@
 {
-  "claim_id": "CLM-0660B75D",
-  "customer_id": "CUST-801666",
-  "policy_number": "POL-2266824",
-  "policy_type": "tk_statutory",
+  "claim_id": "CLM-39552E31",
+  "customer_id": "CUST-539247",
+  "policy_number": "POL-9766871",
+  "policy_type": "hallesche_nk_select_s",
   "items": [
     {
-      "date": "2025-09-12",
+      "date": "2025-10-04",
       "provider": "Praxis Dr. Schmidt",
-      "code": "01020",
-      "description": "Ausführliche Beratung",
-      "net_amount": 67.56,
+      "code": "04110",
+      "description": "Physiotherapie",
+      "net_amount": 66.19,
       "currency": "EUR"
     },
     {
-      "date": "2025-09-14",
+      "date": "2025-10-04",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "01010",
+      "description": "Allgemeine Beratung",
+      "net_amount": 49.34,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-19",
       "provider": "Praxis Dr. Mueller",
-      "code": "01030",
-      "description": "Körperliche Untersuchung",
-      "net_amount": 29.67,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-20",
-      "provider": "Praxis Dr. Becker",
-      "code": "01030",
-      "description": "Körperliche Untersuchung",
-      "net_amount": 24.58,
+      "code": "04110",
+      "description": "Physiotherapie",
+      "net_amount": 53.05,
       "currency": "EUR"
     }
   ],
   "documents": [],
   "status": "received",
-  "created_at": "2025-09-24T16:28:48.146100",
-  "total_claimed": 121.81,
+  "created_at": "2025-10-09T18:24:34.827815",
+  "total_claimed": 168.58,
   "customer_info": {
-    "name": "Max Becker",
-    "dob": "1971-02-11",
-    "address": "Musterstraße 55, 94247 Musterstadt"
+    "name": "Lisa Becker",
+    "dob": "1988-04-11",
+    "address": "Musterstraße 15, 59192 Musterstadt"
   }
 }

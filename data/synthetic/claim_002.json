@@ -1,41 +1,25 @@
 {
-  "claim_id": "CLM-CAE466FD",
-  "customer_id": "CUST-190029",
-  "policy_number": "POL-2826291",
-  "policy_type": "hallesche_nk_select_s",
+  "claim_id": "CLM-60AD8DC8",
+  "customer_id": "CUST-171975",
+  "policy_number": "POL-8616924",
+  "policy_type": "tk_statutory",
   "items": [
     {
-      "date": "2025-09-13",
-      "provider": "Praxis Dr. Schmidt",
+      "date": "2025-09-24",
+      "provider": "Praxis Dr. Wagner",
       "code": "01010",
       "description": "Allgemeine Beratung",
-      "net_amount": 49.29,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-01",
-      "provider": "Praxis Dr. Mueller",
-      "code": "01020",
-      "description": "Ausführliche Beratung",
-      "net_amount": 70.15,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-17",
-      "provider": "Praxis Dr. Schmidt",
-      "code": "02100",
-      "description": "Labor Grunduntersuchung",
-      "net_amount": 31.6,
+      "net_amount": 48.0,
       "currency": "EUR"
     }
   ],
   "documents": [],
   "status": "received",
-  "created_at": "2025-09-17T16:28:48.143893",
-  "total_claimed": 151.04,
+  "created_at": "2025-10-06T18:24:34.825628",
+  "total_claimed": 48.0,
   "customer_info": {
-    "name": "Anna Müller",
-    "dob": "1979-05-21",
-    "address": "Musterstraße 24, 43682 Musterstadt"
+    "name": "Lisa Müller",
+    "dob": "1999-11-02",
+    "address": "Musterstraße 26, 20042 Musterstadt"
   }
 }

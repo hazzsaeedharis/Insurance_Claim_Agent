@@ -1,33 +1,25 @@
 {
-  "claim_id": "CLM-7698227F",
-  "customer_id": "CUST-811928",
-  "policy_number": "POL-5142105",
-  "policy_type": "tk_statutory",
+  "claim_id": "CLM-EEF2B6A2",
+  "customer_id": "CUST-897635",
+  "policy_number": "POL-8186959",
+  "policy_type": "hallesche_nk_select_s",
   "items": [
     {
-      "date": "2025-09-15",
-      "provider": "Praxis Dr. Schmidt",
-      "code": "02100",
-      "description": "Labor Grunduntersuchung",
-      "net_amount": 31.35,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-12",
-      "provider": "Praxis Dr. Weber",
-      "code": "04110",
-      "description": "Physiotherapie",
-      "net_amount": 64.33,
+      "date": "2025-09-28",
+      "provider": "Praxis Dr. Wagner",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 22.25,
       "currency": "EUR"
     }
   ],
   "documents": [],
   "status": "received",
-  "created_at": "2025-09-19T16:28:48.146844",
-  "total_claimed": 95.68,
+  "created_at": "2025-10-06T18:24:34.828153",
+  "total_claimed": 22.25,
   "customer_info": {
-    "name": "Lisa Müller",
-    "dob": "1969-12-21",
-    "address": "Musterstraße 22, 63250 Musterstadt"
+    "name": "Anna Becker",
+    "dob": "1997-06-01",
+    "address": "Musterstraße 13, 35220 Musterstadt"
   }
 }

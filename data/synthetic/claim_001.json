@@ -1,49 +1,49 @@
 {
-  "claim_id": "CLM-14C3DF90",
-  "customer_id": "CUST-350753",
-  "policy_number": "POL-3036612",
+  "claim_id": "CLM-7C638EEF",
+  "customer_id": "CUST-921736",
+  "policy_number": "POL-9170211",
   "policy_type": "hallesche_nk_select_s",
   "items": [
     {
-      "date": "2025-09-10",
-      "provider": "Praxis Dr. Weber",
-      "code": "04110",
-      "description": "Physiotherapie",
-      "net_amount": 60.22,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-04",
-      "provider": "Praxis Dr. Wagner",
+      "date": "2025-09-15",
+      "provider": "Praxis Dr. Schmidt",
       "code": "01030",
       "description": "Körperliche Untersuchung",
-      "net_amount": 25.31,
+      "net_amount": 22.2,
       "currency": "EUR"
     },
     {
-      "date": "2025-09-12",
-      "provider": "Praxis Dr. Schmidt",
-      "code": "04110",
-      "description": "Physiotherapie",
-      "net_amount": 56.45,
-      "currency": "EUR"
-    },
-    {
-      "date": "2025-09-12",
+      "date": "2025-09-25",
       "provider": "Praxis Dr. Weber",
       "code": "01020",
       "description": "Ausführliche Beratung",
-      "net_amount": 82.87,
+      "net_amount": 71.82,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-27",
+      "provider": "Praxis Dr. Wagner",
+      "code": "02100",
+      "description": "Labor Grunduntersuchung",
+      "net_amount": 27.09,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-21",
+      "provider": "Praxis Dr. Becker",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 62.66,
       "currency": "EUR"
     }
   ],
   "documents": [],
   "status": "received",
-  "created_at": "2025-09-17T16:28:48.143242",
-  "total_claimed": 224.85,
+  "created_at": "2025-10-08T18:24:34.824941",
+  "total_claimed": 183.77,
   "customer_info": {
-    "name": "Max Weber",
-    "dob": "1970-02-11",
-    "address": "Musterstraße 52, 41369 Musterstadt"
+    "name": "Peter Weber",
+    "dob": "1997-04-27",
+    "address": "Musterstraße 40, 31046 Musterstadt"
   }
 }

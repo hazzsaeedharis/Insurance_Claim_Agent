@@ -1,33 +1,33 @@
 {
-  "claim_id": "CLM-FA494473",
-  "customer_id": "CUST-454325",
-  "policy_number": "POL-3141763",
+  "claim_id": "CLM-EB726B5B",
+  "customer_id": "CUST-770910",
+  "policy_number": "POL-9603365",
   "policy_type": "tk_statutory",
   "items": [
     {
-      "date": "2025-09-23",
+      "date": "2025-10-01",
       "provider": "Praxis Dr. Weber",
-      "code": "01030",
-      "description": "Körperliche Untersuchung",
-      "net_amount": 30.05,
+      "code": "01010",
+      "description": "Allgemeine Beratung",
+      "net_amount": 46.82,
       "currency": "EUR"
     },
     {
-      "date": "2025-09-11",
-      "provider": "Praxis Dr. Wagner",
-      "code": "03210",
-      "description": "Röntgen Thorax",
-      "net_amount": 96.21,
+      "date": "2025-09-22",
+      "provider": "Praxis Dr. Becker",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 91.29,
       "currency": "EUR"
     }
   ],
   "documents": [],
   "status": "received",
-  "created_at": "2025-09-23T16:28:48.145710",
-  "total_claimed": 126.26,
+  "created_at": "2025-10-06T18:24:34.827463",
+  "total_claimed": 138.11,
   "customer_info": {
-    "name": "Thomas Schmidt",
-    "dob": "1980-02-15",
-    "address": "Musterstraße 39, 63703 Musterstadt"
+    "name": "Peter Wagner",
+    "dob": "1974-03-23",
+    "address": "Musterstraße 61, 92957 Musterstadt"
   }
 }
