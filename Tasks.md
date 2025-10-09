@@ -28,11 +28,13 @@ Each item is **atomic**, has a **clear start + end**, **one concern**, and **con
 * **End:** `data/gen_synthetic_claims.py` that, when run, outputs 10 JSON claim objects to `data/synthetic/` (no PDFs yet).
 * **Acceptance tests:** running script creates `data/synthetic/claim_001.json` … `claim_010.json`.
 
-**PROJ-04 — Generate 5 synthetic PDF receipts (placeholder)**
+**PROJ-04 — Generate 5 synthetic PDF receipts (SKIPPED)**
 
-* **Start:** PROJ-03 done
-* **End:** `data/synthetic_pdfs/` contains 5 simple PDFs (text receipt, claim form) created from the JSONs.
-* **Acceptance tests:** `file` or `ls` shows 5 PDFs; each PDF is readable text (no OCR needed yet).
+* **Status:** CANCELLED - Using real Hallesche policy documents and sample claims instead
+* **Real data location:** 
+  - Policy PDFs: `data/policies/hallesche/` (pm255u-e-0922.pdf, pm22u-e-1020.pdf, pm7u-e-1020.pdf)
+  - Sample claims: `data/samples/documents/` (hallesche_valid_outpatient.pdf, hallesche_invalid_outpatient.pdf, hallesche_ambiguous_claim.pdf)
+* **Benefit:** Real documents provide better testing for OCR, extraction, and policy validation than synthetic data.
 
 ---
 

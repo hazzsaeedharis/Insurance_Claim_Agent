@@ -1,0 +1,247 @@
+{
+  "realm": "insurance-claims",
+  "roles": {
+    "customer": {
+      "name": "customer",
+      "description": "Insurance policy holder who can submit and view their own claims",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "claim:create:own",
+        "claim:read:own",
+        "claim:update:own",
+        "claim:delete:own",
+        "document:upload:own",
+        "document:read:own",
+        "document:delete:own",
+        "policy:read:own",
+        "profile:read:own",
+        "profile:update:own",
+        "notification:read:own"
+      ],
+      "attributes": {
+        "max_claim_amount": "10000",
+        "max_documents_per_claim": "20",
+        "allowed_file_types": "pdf,jpg,jpeg,png,tiff",
+        "max_file_size_mb": "10"
+      }
+    },
+    "adjuster": {
+      "name": "adjuster",
+      "description": "Claims adjuster who can review and process claims",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "claim:read:all",
+        "claim:update:all",
+        "claim:approve",
+        "claim:reject",
+        "claim:escalate",
+        "claim:assign",
+        "document:read:all",
+        "document:validate",
+        "document:request_additional",
+        "policy:read:all",
+        "customer:read:all",
+        "audit:create",
+        "audit:read:own",
+        "notification:send:customer",
+        "workflow:execute:standard",
+        "report:generate:claims",
+        "report:read:own"
+      ],
+      "attributes": {
+        "max_approval_amount": "50000",
+        "require_review_above": "25000",
+        "max_daily_approvals": "100",
+        "escalation_threshold": "50000"
+      }
+    },
+    "admin": {
+      "name": "admin",
+      "description": "System administrator with full access to all resources",
+      "composite": true,
+      "clientRole": false,
+      "composites": {
+        "realm": ["customer", "adjuster", "system"]
+      },
+      "permissions": [
+        "system:manage:all",
+        "user:manage:all",
+        "role:manage:all",
+        "policy:manage:all",
+        "claim:manage:all",
+        "document:manage:all",
+        "workflow:manage:all",
+        "audit:manage:all",
+        "report:manage:all",
+        "settings:manage:all",
+        "integration:manage:all",
+        "backup:execute",
+        "system:monitor",
+        "system:debug"
+      ],
+      "attributes": {
+        "super_user": "true",
+        "bypass_approval_limits": "true",
+        "access_sensitive_data": "true"
+      }
+    },
+    "system": {
+      "name": "system",
+      "description": "Service account for inter-service communication and automated processes",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "service:communicate:all",
+        "queue:publish:all",
+        "queue:consume:all",
+        "cache:read:all",
+        "cache:write:all",
+        "database:read:all",
+        "database:write:all",
+        "storage:read:all",
+        "storage:write:all",
+        "ocr:execute",
+        "ml:execute",
+        "fraud:check",
+        "policy:validate",
+        "notification:send:all",
+        "workflow:execute:all",
+        "batch:execute",
+        "scheduled:execute",
+        "metrics:write",
+        "logs:write"
+      ],
+      "attributes": {
+        "service_account": "true",
+        "rate_limit_exempt": "true",
+        "internal_only": "true"
+      }
+    },
+    "auditor": {
+      "name": "auditor",
+      "description": "Read-only access for compliance and audit purposes",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "claim:read:all",
+        "document:read:all",
+        "policy:read:all",
+        "customer:read:all",
+        "audit:read:all",
+        "report:read:all",
+        "log:read:all",
+        "metrics:read:all",
+        "workflow:read:all",
+        "settings:read:all"
+      ],
+      "attributes": {
+        "read_only": "true",
+        "export_allowed": "true",
+        "pii_access": "masked"
+      }
+    },
+    "manager": {
+      "name": "manager",
+      "description": "Team manager with oversight and reporting capabilities",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "claim:read:team",
+        "claim:reassign:team",
+        "claim:override:team",
+        "adjuster:read:team",
+        "adjuster:manage:team",
+        "workflow:manage:team",
+        "report:generate:all",
+        "report:read:all",
+        "analytics:read:all",
+        "performance:read:team",
+        "escalation:handle",
+        "policy:override:limited",
+        "audit:read:team",
+        "notification:send:team"
+      ],
+      "attributes": {
+        "max_override_amount": "100000",
+        "team_size_limit": "20",
+        "can_reassign_claims": "true"
+      }
+    },
+    "api_consumer": {
+      "name": "api_consumer",
+      "description": "External API consumer with limited access",
+      "composite": false,
+      "clientRole": false,
+      "permissions": [
+        "api:read:limited",
+        "claim:create:api",
+        "claim:read:api",
+        "document:upload:api",
+        "status:check:api"
+      ],
+      "attributes": {
+        "rate_limit": "1000",
+        "daily_quota": "10000",
+        "api_version": "v1",
+        "ip_whitelist_required": "true"
+      }
+    }
+  },
+  "scopes": {
+    "read": {
+      "description": "Read access to resources",
+      "roles": ["customer", "adjuster", "admin", "system", "auditor", "manager", "api_consumer"]
+    },
+    "write": {
+      "description": "Write access to resources",
+      "roles": ["customer", "adjuster", "admin", "system"]
+    },
+    "delete": {
+      "description": "Delete access to resources",
+      "roles": ["admin", "system"]
+    },
+    "approve": {
+      "description": "Approval authority",
+      "roles": ["adjuster", "admin", "manager"]
+    },
+    "manage": {
+      "description": "Management access",
+      "roles": ["admin", "manager"]
+    }
+  },
+  "role_hierarchy": {
+    "admin": ["manager", "adjuster", "auditor", "customer"],
+    "manager": ["adjuster", "auditor"],
+    "adjuster": ["customer"],
+    "system": [],
+    "auditor": [],
+    "customer": [],
+    "api_consumer": []
+  },
+  "default_roles": {
+    "new_user": "customer",
+    "new_employee": "adjuster",
+    "new_service": "system"
+  },
+  "role_assignment_rules": {
+    "auto_assign": {
+      "email_domain": {
+        "@hallesche.de": "adjuster",
+        "@partner.hallesche.de": "api_consumer"
+      },
+      "user_type": {
+        "policyholder": "customer",
+        "employee": "adjuster",
+        "service_account": "system"
+      }
+    },
+    "approval_required": {
+      "admin": true,
+      "manager": true,
+      "system": true,
+      "auditor": true
+    }
+  }
+}
