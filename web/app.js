@@ -72,6 +72,9 @@ document.getElementById('claimForm').addEventListener('submit', async function(e
 // NEW: Process claim with real AI backend
 async function processClaimWithRealAPI(file, policyNumber, startTime) {
     try {
+        // Generate a single claim ID to use throughout the process
+        const claimId = 'CLAIM-' + Date.now();
+        
         // Step 1: Document Received
         await animateStep(1);
         
@@ -82,7 +85,7 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('claim_id', 'CLAIM-' + Date.now());
+        formData.append('claim_id', claimId); // Use the same claim ID
         formData.append('document_type_hint', 'medical_invoice');
         
         const extractResponse = await fetch(`${API_BASE_URL}/documents/extract`, {
@@ -102,13 +105,12 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         step3.querySelector('p').textContent = 'Matching against policy...';
         await animateStep(3);
         
-        const analysisResponse = await fetch(`${API_BASE_URL}/claims/analyze/CLAIM-${Date.now()}`, {
+        const analysisResponse = await fetch(`${API_BASE_URL}/claims/analyze/${claimId}`, { // Use the same claim ID
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                claim_id: 'CLAIM-' + Date.now(),
                 policy_id: 'HALLESCHE_NK_SELECT_S',
                 customer_id: 'DEMO-CUSTOMER'
             })
@@ -133,7 +135,7 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         
         // Show results with REAL data
         const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
-        showRealResults(analysisData, processingTime, extractedData);
+        showRealResults(analysisData, processingTime, extractedData, claimId);
         
         // Update counters
         claimsCounter++;
@@ -161,9 +163,8 @@ async function animateStep(stepNumber) {
 }
 
 // NEW: Show REAL results with justification
-function showRealResults(analysisData, processingTime, extractedData) {
-    // Generate claim ID
-    const claimId = `CLM-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+function showRealResults(analysisData, processingTime, extractedData, claimId) {
+    // Use the provided claim ID from the processing
     
     // Update basic results
     document.getElementById('claimId').textContent = claimId;
