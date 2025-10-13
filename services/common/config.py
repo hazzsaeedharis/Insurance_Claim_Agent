@@ -32,7 +32,7 @@ class DatabaseConfig(BaseSettings):
         """Get async database URL."""
         return f"postgresql+asyncpg://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
     
-    model_config = SettingsConfigDict(env_prefix="DB_")
+    model_config = SettingsConfigDict(env_prefix="DB_", extra="ignore")
 
 
 class MinioConfig(BaseSettings):
@@ -45,7 +45,7 @@ class MinioConfig(BaseSettings):
     bucket_name: str = Field(default="insurance-documents", env="MINIO_BUCKET")
     region: str = Field(default="us-east-1", env="MINIO_REGION")
     
-    model_config = SettingsConfigDict(env_prefix="MINIO_")
+    model_config = SettingsConfigDict(env_prefix="MINIO_", extra="ignore")
 
 
 class RedisConfig(BaseSettings):
@@ -64,7 +64,7 @@ class RedisConfig(BaseSettings):
             return f"redis://:{self.password}@{self.host}:{self.port}/{self.db}"
         return f"redis://{self.host}:{self.port}/{self.db}"
     
-    model_config = SettingsConfigDict(env_prefix="REDIS_")
+    model_config = SettingsConfigDict(env_prefix="REDIS_", extra="ignore")
 
 
 class RabbitMQConfig(BaseSettings):
@@ -81,7 +81,7 @@ class RabbitMQConfig(BaseSettings):
         """Get RabbitMQ URL."""
         return f"amqp://{self.username}:{self.password}@{self.host}:{self.port}/{self.vhost}"
     
-    model_config = SettingsConfigDict(env_prefix="RABBITMQ_")
+    model_config = SettingsConfigDict(env_prefix="RABBITMQ_", extra="ignore")
 
 
 class KeycloakConfig(BaseSettings):
@@ -94,7 +94,7 @@ class KeycloakConfig(BaseSettings):
     admin_username: str = Field(default="admin", env="KEYCLOAK_ADMIN")
     admin_password: str = Field(default="admin123", env="KEYCLOAK_ADMIN_PASSWORD")
     
-    model_config = SettingsConfigDict(env_prefix="KEYCLOAK_")
+    model_config = SettingsConfigDict(env_prefix="KEYCLOAK_", extra="ignore")
 
 
 class ServiceDiscovery(BaseSettings):
@@ -111,7 +111,7 @@ class ServiceDiscovery(BaseSettings):
     ocr_service_port: int = Field(default=8003, env="OCR_SERVICE_PORT")
     processing_service_port: int = Field(default=8004, env="PROCESSING_SERVICE_PORT")
     
-    model_config = SettingsConfigDict(env_prefix="SERVICE_")
+    model_config = SettingsConfigDict(env_prefix="SERVICE_", extra="ignore")
 
 
 class OCRConfig(BaseSettings):
@@ -132,7 +132,7 @@ class OCRConfig(BaseSettings):
             return v.split(",")
         return v
     
-    model_config = SettingsConfigDict(env_prefix="OCR_")
+    model_config = SettingsConfigDict(env_prefix="OCR_", extra="ignore")
 
 
 class SecurityConfig(BaseSettings):
@@ -158,7 +158,7 @@ class SecurityConfig(BaseSettings):
             return v.split(",")
         return v
     
-    model_config = SettingsConfigDict(env_prefix="SECURITY_")
+    model_config = SettingsConfigDict(env_prefix="SECURITY_", extra="ignore")
 
 
 class AppConfig(BaseSettings):
@@ -205,7 +205,11 @@ class AppConfig(BaseSettings):
             raise ValueError(f"Environment must be one of {allowed}")
         return v
     
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        env_file_encoding="utf-8",
+        extra="ignore"  # Ignore extra env vars not defined in this class
+    )
 
 
 class Settings:
