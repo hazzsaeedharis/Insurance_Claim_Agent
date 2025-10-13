@@ -140,6 +140,36 @@ services:
     networks:
       - insurance-network
 
+  # AI Processing Service
+  ai-processing-service:
+    build:
+      context: ..
+      dockerfile: infra/dockerfiles/Dockerfile.ai
+    container_name: insurance-ai-processing
+    environment:
+      SERVICE_NAME: ai-processing
+      DATABASE_URL: postgresql://insurance_admin:${POSTGRES_PASSWORD:-dev_password_123}@postgres:5432/insurance_claims
+      REDIS_URL: redis://redis:6379/0
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "8005:8005"
+    volumes:
+      - ../data:/app/data:ro  # Read-only access to policy documents
+      - ai_data:/app/chroma_db  # Persistent vector database
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - insurance-network
+
 volumes:
   postgres_data:
     driver: local
@@ -148,6 +178,8 @@ volumes:
   redis_data:
     driver: local
   rabbitmq_data:
+    driver: local
+  ai_data:
     driver: local
 
 networks:
