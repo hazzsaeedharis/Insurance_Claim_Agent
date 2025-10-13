@@ -41,6 +41,10 @@ policy_indexer = PolicyIndexer()
 document_processor = DocumentProcessor()
 claim_analyzer = ClaimAnalyzer()
 
+# In-memory storage for extracted documents (for demo purposes)
+# In production, this would be stored in a database
+extracted_documents_cache: Dict[str, Dict[str, Any]] = {}
+
 
 # Pydantic models
 class PolicyIndexRequest(BaseModel):
@@ -177,9 +181,14 @@ async def extract_document(
         # Calculate processing time
         processing_time = int((datetime.now() - start_time).total_seconds() * 1000)
         
-        # Store extracted data (in real system, this would go to database)
-        # For now, we'll just log it
-        logger.info(f"Processed document for claim {claim_id}: {result['document_type']}")
+        # Store extracted data in cache
+        extracted_documents_cache[claim_id] = {
+            "document_type": result["document_type"],
+            "extracted_data": result["extracted_data"],
+            "upload_timestamp": datetime.now().isoformat(),
+            "filename": file.filename
+        }
+        logger.info(f"Stored extracted data for claim {claim_id}: {result['document_type']}")
         
         return DocumentProcessResponse(
             success=True,
@@ -207,27 +216,19 @@ async def analyze_claim(
     the reimbursement amount with detailed justification.
     """
     try:
-        # In a real system, we would fetch this from database
-        # For demo, we'll use mock data
+        # Get the actual extracted data from cache
+        if claim_id not in extracted_documents_cache:
+            logger.error(f"No extracted data found for claim {claim_id}")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"No extracted document found for claim {claim_id}. Please upload and extract a document first."
+            )
         
-        # Get extracted data for the claim (mock)
-        extracted_data = {
-            "provider": {"name": "Dr. Schmidt Medical Center"},
-            "services": [
-                {
-                    "description": "General consultation - Allgemeine Beratung",
-                    "code": "01010",
-                    "total_price": 85.00,
-                    "date": "2024-01-15"
-                },
-                {
-                    "description": "Blood test - Blutuntersuchung",
-                    "code": "02100", 
-                    "total_price": 45.50,
-                    "date": "2024-01-15"
-                }
-            ]
-        }
+        # Use the real extracted data
+        cached_data = extracted_documents_cache[claim_id]
+        extracted_data = cached_data["extracted_data"]
+        
+        logger.info(f"Retrieved extracted data for claim {claim_id}: {cached_data['document_type']}")
         
         # Get customer data (mock)
         customer_data = {
