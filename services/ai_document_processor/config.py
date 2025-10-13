@@ -3,16 +3,17 @@
 import os
 from typing import Optional
 from pydantic_settings import BaseSettings
+from pydantic import Field
 
 
 class AIConfig(BaseSettings):
     """AI and API configuration settings"""
     
-    # API Keys (set via environment variables)
-    groq_api_key: Optional[str] = None
-    openai_api_key: Optional[str] = None
-    pinecone_api_key: Optional[str] = None
-    pinecone_environment: Optional[str] = None
+    # API Keys (automatically loaded from environment variables or .env file)
+    groq_api_key: Optional[str] = Field(None, env='GROQ_API_KEY')
+    openai_api_key: Optional[str] = Field(None, env='OPENAI_API_KEY')
+    pinecone_api_key: Optional[str] = Field(None, env='PINECONE_API_KEY')
+    pinecone_environment: Optional[str] = Field(None, env='PINECONE_ENVIRONMENT')
     
     # Model Configuration
     embedding_model: str = "text-embedding-3-small"  # Best for multilingual
