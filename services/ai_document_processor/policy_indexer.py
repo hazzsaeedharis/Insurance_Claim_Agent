@@ -10,14 +10,14 @@ from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 import logging
 
-import chromadb
-from chromadb.config import Settings
-import pypdf2
+import PyPDF2
 import pdfplumber
 from groq import Groq
 import openai
 import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
+from pinecone import Pinecone, ServerlessSpec
+import numpy as np
 
 from services.ai_document_processor.config import ai_config, POLICY_SECTIONS
 
@@ -52,19 +52,35 @@ class PolicyIndexer:
     
     def __init__(self):
         """Initialize the indexer with vector database"""
-        # Initialize ChromaDB (local) or Pinecone based on config
-        if ai_config.vector_db_type == "chromadb":
-            self.client = chromadb.Client(Settings(
-                chroma_db_impl="duckdb+parquet",
-                persist_directory="./chroma_db"
-            ))
-            self.collection = self.client.get_or_create_collection(
-                name=ai_config.collection_name,
-                metadata={"hnsw:space": "cosine"}
-            )
+        # Initialize Pinecone based on config
+        if ai_config.vector_db_type == "pinecone":
+            if not ai_config.pinecone_api_key:
+                raise ValueError("Pinecone API key is required when using Pinecone")
+            
+            # Initialize Pinecone
+            self.pc = Pinecone(api_key=ai_config.pinecone_api_key)
+            
+            # Check if index exists
+            existing_indexes = [idx.name for idx in self.pc.list_indexes()]
+            
+            if ai_config.collection_name not in existing_indexes:
+                # Create index with appropriate dimension for sentence transformers
+                logger.info(f"Creating Pinecone index: {ai_config.collection_name}")
+                self.pc.create_index(
+                    name=ai_config.collection_name,
+                    dimension=384,  # all-MiniLM-L6-v2 dimension
+                    metric="cosine",
+                    spec=ServerlessSpec(
+                        cloud="aws",
+                        region=ai_config.pinecone_environment.split("-", 1)[1] if ai_config.pinecone_environment else "us-east-1"
+                    )
+                )
+            
+            # Get index
+            self.index = self.pc.Index(ai_config.collection_name)
+            logger.info(f"Connected to Pinecone index: {ai_config.collection_name}")
         else:
-            # TODO: Add Pinecone support
-            raise NotImplementedError("Pinecone support coming soon")
+            raise NotImplementedError(f"Vector DB type {ai_config.vector_db_type} not supported. Use 'pinecone'.")
         
         # Initialize LLMs (priority: Gemini > OpenAI > Groq)
         self.groq_client = Groq(api_key=ai_config.groq_api_key) if ai_config.groq_api_key else None
@@ -347,13 +363,24 @@ class PolicyIndexer:
         logger.info(f"Generating embeddings for {len(documents)} chunks")
         embeddings = self.generate_embeddings(documents)
         
-        # Index in vector database
-        self.collection.add(
-            embeddings=embeddings,
-            documents=documents,
-            metadatas=metadatas,
-            ids=ids
-        )
+        # Index in Pinecone
+        # Prepare vectors for upsert
+        vectors = []
+        for i, (id_, emb, doc, meta) in enumerate(zip(ids, embeddings, documents, metadatas)):
+            # Add the document text to metadata for retrieval
+            meta["text"] = doc
+            vectors.append({
+                "id": id_,
+                "values": emb,
+                "metadata": meta
+            })
+        
+        # Upsert in batches (Pinecone recommends batches of 100)
+        batch_size = 100
+        for i in range(0, len(vectors), batch_size):
+            batch = vectors[i:i+batch_size]
+            self.index.upsert(vectors=batch)
+            logger.info(f"Upserted batch {i//batch_size + 1}/{(len(vectors) + batch_size - 1)//batch_size}")
         
         logger.info(f"Successfully indexed {len(documents)} chunks")
         
@@ -392,20 +419,25 @@ class PolicyIndexer:
         # Generate query embedding
         query_embedding = self.generate_embeddings([query])[0]
         
-        # Search in vector database
-        results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            where={"policy_id": policy_id} if policy_id else None
+        # Build filter for policy_id if specified
+        filter_dict = {"policy_id": policy_id} if policy_id else {}
+        
+        # Search in Pinecone
+        results = self.index.query(
+            vector=query_embedding,
+            top_k=top_k,
+            include_values=False,
+            include_metadata=True,
+            filter=filter_dict
         )
         
         # Format results
         formatted_results = []
-        for i in range(len(results["ids"][0])):
+        for match in results.matches:
             formatted_results.append({
-                "text": results["documents"][0][i],
-                "metadata": results["metadatas"][0][i],
-                "distance": results["distances"][0][i] if "distances" in results else None
+                "text": match.metadata.get("text", ""),
+                "metadata": match.metadata,
+                "distance": 1 - match.score  # Convert cosine similarity to distance
             })
         
         return formatted_results

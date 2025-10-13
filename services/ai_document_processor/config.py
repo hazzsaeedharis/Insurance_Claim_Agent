@@ -26,7 +26,7 @@ class AIConfig(BaseSettings):
     gemini_embedding_model: str = "models/embedding-001"  # Gemini embedding
     llm_model: str = "gpt-4"  # OpenAI LLM
     gemini_llm_model: str = "gemini-1.5-pro"  # Gemini LLM
-    groq_model: str = "mixtral-8x7b-32768"  # Groq LLM
+    groq_model: str = "llama-3.3-70b-versatile"  # Groq LLM (best quality)
     
     # Processing Configuration
     chunk_size: int = 500  # Characters per chunk
@@ -35,12 +35,13 @@ class AIConfig(BaseSettings):
     timeout_seconds: int = 30
     
     # Vector DB Configuration
-    vector_db_type: str = "chromadb"  # "chromadb" or "pinecone"
-    collection_name: str = "insurance_policies"
+    vector_db_type: str = "pinecone"  # "chromadb" or "pinecone"
+    collection_name: str = "insurance-policies"  # Pinecone index name
     
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Ignore extra fields from .env that aren't in this config
 
 
 # Singleton instance

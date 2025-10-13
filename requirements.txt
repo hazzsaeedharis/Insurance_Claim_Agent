@@ -1,59 +1,60 @@
 # Core Dependencies
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+fastapi
+uvicorn
+pydantic
+pydantic-settings
 
 # Database
-sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
-alembic==1.12.1
+sqlalchemy
+psycopg2-binary
+alembic
 
 # Storage
-minio==7.2.0
+minio
+pinecone
 
 # Redis
-redis==5.0.1
+redis
 
 # Message Queue
-pika==1.3.2  # RabbitMQ client
+pika  # RabbitMQ client
 
 # Authentication
-pyjwt==2.8.0
-python-keycloak==3.7.0
-httpx==0.25.2  # Required by python-keycloak
+pyjwt
+python-keycloak
+httpx  # Required by python-keycloak
 
 # OCR and Document Processing
-pytesseract==0.3.10
-pillow==10.1.0
-pdf2image==1.16.3
-opencv-python==4.8.1.78
-pypdf2==3.0.1
-pdfplumber==0.9.0
+pytesseract
+pillow
+pdf2image
+opencv-python
+PyPDF2
+pdfplumber
 
 # AI and ML
-openai==1.12.0
-groq==0.4.2
-google-generativeai==0.3.2  # Gemini API (optional)
-chromadb==0.4.22
-langchain==0.1.5
-sentence-transformers==2.2.2  # For local embeddings (FREE, no API needed)
-transformers==4.36.2  # For Hugging Face models
-torch==2.1.2  # Required for transformers
-tiktoken==0.5.2  # For token counting
+openai
+groq
+google-generativeai  # Gemini API (optional)
+pinecone
+langchain
+sentence-transformers  # For local embeddings (FREE, no API needed)
+transformers  # For Hugging Face models
+torch  # Required for transformers
+tiktoken  # For token counting
 
 # API and Networking
-requests==2.31.0
-aiofiles==23.2.1
+requests
+aiofiles
 
 # Utilities
-python-multipart==0.0.6  # For file uploads
-python-dateutil==2.8.2
-pytz==2023.3
+python-multipart  # For file uploads
+python-dateutil
+pytz
 
 # Development
-pytest==7.4.3
-pytest-asyncio==0.21.1
-black==23.11.0
-flake8==6.1.0
+pytest
+pytest-asyncio
+black
+flake8
 
