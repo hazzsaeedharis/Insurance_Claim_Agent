@@ -13,11 +13,16 @@ class AIConfig(BaseSettings):
     groq_api_key: Optional[str] = Field(None, env='GROQ_API_KEY')
     openai_api_key: Optional[str] = Field(None, env='OPENAI_API_KEY')
     gemini_api_key: Optional[str] = Field(None, env='GEMINI_API_KEY')
+    huggingface_api_key: Optional[str] = Field(None, env='HUGGINGFACE_API_KEY')
     pinecone_api_key: Optional[str] = Field(None, env='PINECONE_API_KEY')
     pinecone_environment: Optional[str] = Field(None, env='PINECONE_ENVIRONMENT')
     
+    # Embedding Strategy: "local", "openai", "gemini", "huggingface"
+    embedding_strategy: str = Field("local", env='EMBEDDING_STRATEGY')
+    
     # Model Configuration
-    embedding_model: str = "text-embedding-3-small"  # OpenAI embedding
+    local_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"  # Local FREE embeddings
+    openai_embedding_model: str = "text-embedding-3-small"  # OpenAI embedding
     gemini_embedding_model: str = "models/embedding-001"  # Gemini embedding
     llm_model: str = "gpt-4"  # OpenAI LLM
     gemini_llm_model: str = "gemini-1.5-pro"  # Gemini LLM

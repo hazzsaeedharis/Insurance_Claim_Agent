@@ -5,11 +5,27 @@ param(
     [string]$ApiKey = $env:GROQ_API_KEY
 )
 
+# Try to load .env file if API key not found
+if (-not $ApiKey -and (Test-Path .env)) {
+    Write-Host "[>] Loading API key from .env file..." -ForegroundColor Cyan
+    Get-Content .env | ForEach-Object {
+        if ($_ -match '^GROQ_API_KEY=(.+)$') {
+            $ApiKey = $matches[1].Trim()
+        }
+    }
+}
+
 if (-not $ApiKey) {
     Write-Host "[ERROR] GROQ_API_KEY not found!" -ForegroundColor Red
-    Write-Host "Please set your API key:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Option 1: Load from .env file" -ForegroundColor Yellow
+    Write-Host '  . .\load-env.ps1' -ForegroundColor Cyan
+    Write-Host '  .\check-groq-models.ps1' -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Option 2: Set manually" -ForegroundColor Yellow
     Write-Host '  $env:GROQ_API_KEY = "your_api_key_here"' -ForegroundColor Cyan
-    Write-Host "Or pass it as parameter:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Option 3: Pass as parameter" -ForegroundColor Yellow
     Write-Host '  .\check-groq-models.ps1 -ApiKey "your_api_key_here"' -ForegroundColor Cyan
     exit 1
 }

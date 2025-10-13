@@ -17,10 +17,22 @@ import pdfplumber
 from groq import Groq
 import openai
 import google.generativeai as genai
+from sentence_transformers import SentenceTransformer
 
 from services.ai_document_processor.config import ai_config, POLICY_SECTIONS
 
 logger = logging.getLogger(__name__)
+
+# Initialize local embedding model (loaded once globally for efficiency)
+_local_embedding_model = None
+
+def get_local_embedding_model():
+    """Get or initialize the local embedding model"""
+    global _local_embedding_model
+    if _local_embedding_model is None:
+        logger.info(f"Loading local embedding model: {ai_config.local_embedding_model}")
+        _local_embedding_model = SentenceTransformer(ai_config.local_embedding_model)
+    return _local_embedding_model
 
 
 @dataclass
@@ -252,9 +264,20 @@ class PolicyIndexer:
             return {}
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for texts using Gemini, OpenAI, or fallback"""
-        if self.use_gemini:
+        """Generate embeddings for texts using Gemini, OpenAI, or local model"""
+        # Use embedding strategy from config
+        strategy = ai_config.embedding_strategy
+        
+        if strategy == "local" or (not self.use_gemini and not self.use_openai):
+            # Use local Sentence Transformers (FREE, no API key needed!)
+            logger.info("Using local Sentence Transformers for embeddings (FREE)")
+            model = get_local_embedding_model()
+            embeddings = model.encode(texts, show_progress_bar=False)
+            return embeddings.tolist()
+        
+        elif self.use_gemini and strategy == "gemini":
             # Use Gemini embeddings (excellent for multilingual)
+            logger.info("Using Gemini API for embeddings")
             embeddings = []
             for text in texts:
                 result = genai.embed_content(
@@ -264,18 +287,22 @@ class PolicyIndexer:
                 )
                 embeddings.append(result['embedding'])
             return embeddings
-        elif self.use_openai:
+        
+        elif self.use_openai and strategy == "openai":
             # Use OpenAI embeddings (best quality for multilingual)
+            logger.info("Using OpenAI API for embeddings")
             response = openai.Embedding.create(
-                model=ai_config.embedding_model,
+                model=ai_config.openai_embedding_model,
                 input=texts
             )
             return [item["embedding"] for item in response["data"]]
+        
         else:
-            # TODO: Implement fallback embedding model
-            # For now, we'll use a placeholder
-            logger.warning("No premium embeddings available, using placeholder")
-            return [[0.0] * 768 for _ in texts]  # Placeholder embeddings (Gemini size)
+            # Fallback to local embeddings
+            logger.warning("Falling back to local embeddings")
+            model = get_local_embedding_model()
+            embeddings = model.encode(texts, show_progress_bar=False)
+            return embeddings.tolist()
     
     def index_policy_document(self, pdf_path: str, policy_id: str, policy_name: str) -> Dict[str, Any]:
         """Main method to index a policy document"""

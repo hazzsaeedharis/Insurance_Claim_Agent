@@ -20,11 +20,12 @@ if (Test-Path .env) {
 }
 
 Write-Host ""
-Write-Host "Please enter your API keys (or press Enter to skip):" -ForegroundColor Cyan
+Write-Host "=== 100% FREE SETUP ===" -ForegroundColor Green
+Write-Host "You only need Groq API key + local embeddings (no credit card required!)" -ForegroundColor Gray
 Write-Host ""
 
 # Get Groq API Key
-Write-Host "1. Groq API Key (REQUIRED)" -ForegroundColor Yellow
+Write-Host "1. Groq API Key (REQUIRED - FREE, no credit card)" -ForegroundColor Yellow
 Write-Host "   Get it from: https://console.groq.com/keys" -ForegroundColor Gray
 $groqKey = Read-Host "   Enter your Groq API key"
 
@@ -37,9 +38,25 @@ if ($groqKey) {
 }
 
 Write-Host ""
+Write-Host "=== OPTIONAL: Additional API Keys (skip if you want 100% free) ===" -ForegroundColor Cyan
+Write-Host ""
+
+# Get Hugging Face API Key
+Write-Host "2. Hugging Face API Key (FREE alternative, no credit card)" -ForegroundColor Yellow
+Write-Host "   Get it from: https://huggingface.co/settings/tokens" -ForegroundColor Gray
+$hfKey = Read-Host "   Enter your Hugging Face key (or press Enter to skip)"
+
+if ($hfKey) {
+    (Get-Content .env) -replace 'HUGGINGFACE_API_KEY=.*', "HUGGINGFACE_API_KEY=$hfKey" | Set-Content .env
+    Write-Host "   [OK] Hugging Face API key saved" -ForegroundColor Green
+} else {
+    Write-Host "   [INFO] Skipping - will use local embeddings (FREE!)" -ForegroundColor Yellow
+}
+
+Write-Host ""
 
 # Get Gemini API Key
-Write-Host "2. Gemini API Key (Recommended - FREE tier available!)" -ForegroundColor Yellow
+Write-Host "3. Gemini API Key (Requires credit card - skip for free setup)" -ForegroundColor Yellow
 Write-Host "   Get it from: https://makersuite.google.com/app/apikey" -ForegroundColor Gray
 $geminiKey = Read-Host "   Enter your Gemini API key (or press Enter to skip)"
 
@@ -53,7 +70,7 @@ if ($geminiKey) {
 Write-Host ""
 
 # Get OpenAI API Key
-Write-Host "3. OpenAI API Key (Alternative to Gemini)" -ForegroundColor Yellow
+Write-Host "4. OpenAI API Key (Paid service - skip for free setup)" -ForegroundColor Yellow
 Write-Host "   Get it from: https://platform.openai.com/api-keys" -ForegroundColor Gray
 $openaiKey = Read-Host "   Enter your OpenAI API key (or press Enter to skip)"
 
