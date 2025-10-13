@@ -4,6 +4,7 @@ Matches claims against policy terms and calculates reimbursements
 """
 
 import json
+import re
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass
@@ -140,8 +141,19 @@ class ClaimAnalyzer:
         items = []
         
         # Handle different document structures
-        if "services" in extracted_data:
-            # Medical invoice structure
+        if "servicesRendered" in extracted_data:
+            # New structure from document_processor
+            for service in extracted_data["servicesRendered"]:
+                items.append(ClaimItem(
+                    description=service.get("serviceDescription", "Unknown service"),
+                    code=service.get("procedureCode"),
+                    amount=float(service.get("totalPrice", 0)),
+                    date=service.get("dateOfService", ""),
+                    provider=extracted_data.get("providerInformation", {}).get("name"),
+                    quantity=int(service.get("quantity", 1))
+                ))
+        elif "services" in extracted_data:
+            # Old structure (backward compatibility)
             for service in extracted_data["services"]:
                 items.append(ClaimItem(
                     description=service.get("description", "Unknown service"),
@@ -259,7 +271,18 @@ class ClaimAnalyzer:
                     ],
                     temperature=0.1
                 )
-                coverage = json.loads(response.choices[0].message.content)
+                # Extract JSON from markdown or prose
+                content = response.choices[0].message.content
+                json_match = re.search(r'\{[\s\S]*\}', content)
+                if json_match:
+                    try:
+                        coverage = json.loads(json_match.group())
+                    except json.JSONDecodeError:
+                        logger.warning("Failed to parse JSON from Groq response, using default coverage")
+                        return self._default_coverage()
+                else:
+                    logger.warning("No JSON found in Groq response, using default coverage")
+                    return self._default_coverage()
             
             # Add policy reference
             coverage["policy_reference"] = search_results[0]["text"][:500] + "..."
@@ -317,7 +340,10 @@ class ClaimAnalyzer:
         calculation_notes.append(f"Covered amount: €{item.amount} × {coverage_rate * 100}% = €{covered_amount:.2f}")
         
         # Apply deductible
-        deductible = policy_coverage.get("deductible", 0)
+        deductible = policy_coverage.get("deductible") or 0
+        if isinstance(deductible, dict):
+            deductible = deductible.get("amount", 0) or 0
+        deductible = float(deductible) if deductible else 0
         remaining_deductible = max(0, deductible - customer_data.get("deductible_used_this_year", 0))
         
         deductible_applied = min(remaining_deductible, covered_amount)
@@ -329,6 +355,11 @@ class ClaimAnalyzer:
         
         # Check annual limits
         annual_limit = policy_coverage.get("annual_limit")
+        if annual_limit and annual_limit != "null":
+            if isinstance(annual_limit, dict):
+                annual_limit = annual_limit.get("amount")
+            annual_limit = float(annual_limit) if annual_limit else None
+            
         if annual_limit:
             used_this_year = customer_data.get("claims_paid_this_year", 0)
             remaining_limit = max(0, annual_limit - used_this_year)

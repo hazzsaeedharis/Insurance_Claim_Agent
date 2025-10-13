@@ -121,7 +121,7 @@ class PolicyIndexer:
             logger.warning(f"pdfplumber failed, trying pypdf2: {e}")
             # Fallback to pypdf2
             with open(pdf_path, 'rb') as file:
-                reader = pypdf2.PdfReader(file)
+                reader = PyPDF2.PdfReader(file)
                 for i, page in enumerate(reader.pages):
                     text = page.extract_text()
                     if text:
@@ -271,7 +271,18 @@ class PolicyIndexer:
                     temperature=0.1,
                     max_tokens=1000
                 )
-                metadata = json.loads(response.choices[0].message.content)
+                # Extract JSON from markdown or prose
+                content = response.choices[0].message.content
+                json_match = re.search(r'\{[\s\S]*\}', content)
+                if json_match:
+                    try:
+                        metadata = json.loads(json_match.group())
+                    except json.JSONDecodeError:
+                        logger.warning("Failed to parse JSON from Groq response")
+                        metadata = {}
+                else:
+                    logger.warning("No JSON found in Groq response")
+                    metadata = {}
             
             return metadata
             
@@ -356,7 +367,7 @@ class PolicyIndexer:
                     "chunk_index": i,
                     "total_chunks": len(chunks),
                     **{f"metadata_{k}": json.dumps(v) if isinstance(v, (dict, list)) else v 
-                       for k, v in section.metadata.items()}
+                       for k, v in section.metadata.items() if v is not None}
                 })
         
         # Generate embeddings

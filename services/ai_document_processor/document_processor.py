@@ -258,7 +258,12 @@ class DocumentProcessor:
                 if json_match:
                     extracted = json.loads(json_match.group())
                 else:
-                    extracted = json.loads(content)
+                    # Try direct parsing, return empty dict if it fails
+                    try:
+                        extracted = json.loads(content)
+                    except json.JSONDecodeError:
+                        logger.warning("Failed to parse JSON from Groq response")
+                        extracted = {}
             
             return extracted
             

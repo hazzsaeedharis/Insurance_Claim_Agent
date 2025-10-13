@@ -20,7 +20,7 @@ from services.ai_document_processor.claim_analyzer import ClaimAnalyzer
 async def test_pipeline():
     """Test the complete document processing pipeline"""
     
-    print("🚀 Testing AI Document Processing Pipeline")
+    print("Testing AI Document Processing Pipeline")
     print("=" * 50)
     
     # Initialize components
@@ -28,7 +28,7 @@ async def test_pipeline():
     policy_indexer = PolicyIndexer()
     document_processor = DocumentProcessor()
     claim_analyzer = ClaimAnalyzer()
-    print("✅ Components initialized")
+    print("[OK] Components initialized")
     
     # Test 1: Index a policy document
     print("\n2. Testing Policy Indexing...")
@@ -42,15 +42,15 @@ async def test_pipeline():
                 policy_id="HALLESCHE_NK_SELECT_S",
                 policy_name="Hallesche NK.select S"
             )
-            print(f"✅ Policy indexed successfully!")
+            print(f"[OK] Policy indexed successfully!")
             print(f"   - Total sections: {result['total_sections']}")
             print(f"   - Total chunks: {result['total_chunks']}")
             print(f"   - Section types: {', '.join(result['section_types'])}")
         except Exception as e:
-            print(f"❌ Error indexing policy: {e}")
+            print(f"[ERROR] Error indexing policy: {e}")
             print("   Note: You need to set OPENAI_API_KEY for embeddings or the system will use placeholders")
     else:
-        print(f"⚠️  Policy file not found: {policy_path}")
+        print(f"[WARNING] Policy file not found: {policy_path}")
     
     # Test 2: Process a claim document
     print("\n3. Testing Document Processing...")
@@ -63,7 +63,7 @@ async def test_pipeline():
                 file_path=claim_path,
                 hints={"document_type": "medical_invoice"}
             )
-            print(f"✅ Document processed successfully!")
+            print(f"[OK] Document processed successfully!")
             print(f"   - Document type: {result['document_type']}")
             print(f"   - Confidence: {result['confidence_scores'].get('overall', 0):.2%}")
             print(f"   - Extracted fields: {len(result['extracted_data'])} items")
@@ -78,7 +78,7 @@ async def test_pipeline():
                     print(f"     • {service.get('description', 'Unknown')}: €{service.get('total_price', 0)}")
             
         except Exception as e:
-            print(f"❌ Error processing document: {e}")
+            print(f"[ERROR] Error processing document: {e}")
             print("   Note: Make sure Tesseract OCR is installed")
             # Create mock data for testing
             extracted_data = {
@@ -93,7 +93,7 @@ async def test_pipeline():
                 ]
             }
     else:
-        print(f"⚠️  Claim file not found: {claim_path}")
+        print(f"[WARNING] Claim file not found: {claim_path}")
         # Create mock data
         extracted_data = {
             "provider": {"name": "Dr. Schmidt Medical Center"},
@@ -124,7 +124,7 @@ async def test_pipeline():
             customer_data=customer_data
         )
         
-        print(f"✅ Claim analyzed successfully!")
+        print(f"[OK] Claim analyzed successfully!")
         print(f"   - Total claimed: €{result['total_claimed']:.2f}")
         print(f"   - Total approved: €{result['total_approved']:.2f}")
         print(f"   - Approval rate: {result['approval_rate']:.1f}%")
@@ -136,7 +136,7 @@ async def test_pipeline():
         print("   ...")
         
     except Exception as e:
-        print(f"❌ Error analyzing claim: {e}")
+        print(f"[ERROR] Error analyzing claim: {e}")
     
     # Test 4: Search policy
     print("\n5. Testing Policy Search...")
@@ -150,20 +150,20 @@ async def test_pipeline():
         )
         
         if search_results:
-            print(f"✅ Found {len(search_results)} relevant policy sections")
+            print(f"[OK] Found {len(search_results)} relevant policy sections")
             for i, result in enumerate(search_results[:2], 1):
                 print(f"\n   Result {i}:")
                 print(f"   {result['text'][:150]}...")
                 if result['metadata']:
                     print(f"   Section: {result['metadata'].get('section_type', 'Unknown')}")
         else:
-            print("⚠️  No search results found (vector DB might be empty)")
+            print("[WARNING] No search results found (vector DB might be empty)")
             
     except Exception as e:
-        print(f"❌ Error searching policy: {e}")
+        print(f"[ERROR] Error searching policy: {e}")
     
     print("\n" + "=" * 50)
-    print("🎉 Testing complete!")
+    print("Testing complete!")
     print("\nNotes:")
     print("- For production use, add your OPENAI_API_KEY to get better embeddings")
     print("- Make sure to set GROQ_API_KEY environment variable")
@@ -172,13 +172,13 @@ async def test_pipeline():
 
 if __name__ == "__main__":
     # Check API keys
-    print("\n🔑 API Key Status:")
-    print(f"   - Groq API Key: {'✅ Set' if ai_config.groq_api_key else '❌ Missing'}")
-    print(f"   - Gemini API Key: {'✅ Set' if ai_config.gemini_api_key else '⚠️  Not set'}")
-    print(f"   - OpenAI API Key: {'✅ Set' if ai_config.openai_api_key else '⚠️  Not set'}")
+    print("\nAPI Key Status:")
+    print(f"   - Groq API Key: {'[OK] Set' if ai_config.groq_api_key else '[ERROR] Missing'}")
+    print(f"   - Gemini API Key: {'[OK] Set' if ai_config.gemini_api_key else '[WARNING] Not set'}")
+    print(f"   - OpenAI API Key: {'[OK] Set' if ai_config.openai_api_key else '[WARNING] Not set'}")
     
     if not ai_config.groq_api_key:
-        print("\n⚠️  Groq API key is required!")
+        print("\n[WARNING] Groq API key is required!")
         print("   Please set the GROQ_API_KEY environment variable:")
         print("   export GROQ_API_KEY='your_groq_api_key_here'")
         print("\n   Get your API key from: https://console.groq.com/keys")
