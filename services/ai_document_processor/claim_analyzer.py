@@ -11,6 +11,7 @@ from datetime import datetime
 
 from groq import Groq
 import openai
+import google.generativeai as genai
 
 from services.ai_document_processor.config import ai_config
 from services.ai_document_processor.policy_indexer import PolicyIndexer
@@ -49,14 +50,24 @@ class ClaimAnalyzer:
         self.policy_indexer = PolicyIndexer()
         
         # Initialize Groq client
-        self.groq_client = Groq(api_key=ai_config.groq_api_key)
+        self.groq_client = Groq(api_key=ai_config.groq_api_key) if ai_config.groq_api_key else None
         
+        # Initialize Gemini if available (priority)
+        if ai_config.gemini_api_key:
+            genai.configure(api_key=ai_config.gemini_api_key)
+            self.use_gemini = True
+            self.use_openai = False
+            logger.info("Using Gemini API for claim analysis")
         # Initialize OpenAI if available
-        if ai_config.openai_api_key:
+        elif ai_config.openai_api_key:
             openai.api_key = ai_config.openai_api_key
             self.use_openai = True
+            self.use_gemini = False
+            logger.info("Using OpenAI API for claim analysis")
         else:
             self.use_openai = False
+            self.use_gemini = False
+            logger.info("Using Groq for claim analysis")
     
     def analyze_claim(
         self, 
@@ -215,7 +226,20 @@ class ClaimAnalyzer:
         """
         
         try:
-            if self.use_openai:
+            if self.use_gemini:
+                model = genai.GenerativeModel(ai_config.gemini_llm_model)
+                response = model.generate_content(
+                    f"You are an insurance policy expert. Analyze coverage based on policy terms and return JSON only.\n\n{interpretation_prompt}",
+                    generation_config=genai.types.GenerationConfig(temperature=0.1)
+                )
+                # Extract JSON from response
+                content = response.text
+                json_match = re.search(r'\{[\s\S]*\}', content)
+                if json_match:
+                    coverage = json.loads(json_match.group())
+                else:
+                    coverage = json.loads(content)
+            elif self.use_openai:
                 response = openai.ChatCompletion.create(
                     model="gpt-4",
                     messages=[

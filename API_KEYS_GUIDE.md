@@ -12,17 +12,24 @@
   - Interpreting policy terms
   - Generating justifications
 
-### 2. **OpenAI API Key** (HIGHLY RECOMMENDED) 🌟
-- **Purpose**: Superior embeddings and GPT-4 for complex extraction
-- **Get it from**: https://platform.openai.com/api-keys
-- **Cost**: Pay-per-use (approximately $0.03 per claim with GPT-4)
-- **Benefits over Groq**:
-  - Better accuracy for German documents
+### 2. **Gemini API Key** (HIGHLY RECOMMENDED) 🌟
+- **Purpose**: Google's best AI for extraction, embeddings, and analysis
+- **Get it from**: https://makersuite.google.com/app/apikey
+- **Cost**: **FREE tier with 60 requests/minute!**
+- **Benefits**:
+  - Excellent for German documents (multilingual)
+  - Free embeddings (768 dimensions)
+  - Gemini 1.5 Pro with 2M context window
   - Superior semantic understanding
   - More reliable structured output
-  - Best-in-class embeddings for policy matching
 
-### 3. **Pinecone API Key** (OPTIONAL) 💡
+### 3. **OpenAI API Key** (ALTERNATIVE) 💡
+- **Purpose**: Alternative to Gemini for embeddings and GPT-4
+- **Get it from**: https://platform.openai.com/api-keys
+- **Cost**: Pay-per-use (approximately $0.03 per claim with GPT-4)
+- **Note**: Use this if you prefer OpenAI or already have credits
+
+### 4. **Pinecone API Key** (OPTIONAL) 💡
 - **Purpose**: Cloud-based vector database (alternative to local ChromaDB)
 - **Get it from**: https://app.pinecone.io/
 - **Cost**: Free tier available
@@ -42,10 +49,13 @@ notepad .env  # or use your preferred editor
 ### Step 2: Add your keys to .env
 ```env
 # Minimum required setup
-GROQ_API_KEY=gsk_your_actual_groq_key_here
+GROQ_API_KEY=your_actual_groq_key_here
 
-# Recommended for production
-OPENAI_API_KEY=sk-your_actual_openai_key_here
+# Recommended for production (FREE tier!)
+GEMINI_API_KEY=your_actual_gemini_key_here
+
+# Optional alternative to Gemini
+OPENAI_API_KEY=your_actual_openai_key_here
 ```
 
 ### Step 3: Test your setup
@@ -59,23 +69,27 @@ python test_ai_processing.py
 
 ## Cost Comparison
 
-| Feature | Groq Only | Groq + OpenAI | 
-|---------|-----------|---------------|
-| Document Classification | ✅ Free | ✅ Free (uses Groq) |
-| Data Extraction | ✅ Free | ✅ ~$0.001/claim |
-| Policy Embeddings | ❌ Placeholder | ✅ ~$0.0001/section |
-| Complex Analysis | ⚠️ Good | ✅ Excellent |
-| German Language | ⚠️ Good | ✅ Excellent |
-| **Total Cost/Claim** | **$0** | **~$0.03** |
+| Feature | Groq Only | Groq + Gemini (RECOMMENDED) | Groq + OpenAI | 
+|---------|-----------|----------------------------|---------------|
+| Document Classification | ✅ Free | ✅ Free | ✅ ~$0.0001/claim |
+| Data Extraction | ✅ Free | ✅ Free | ✅ ~$0.001/claim |
+| Policy Embeddings | ❌ Placeholder | ✅ Free | ✅ ~$0.0001/section |
+| Complex Analysis | ⚠️ Good | ✅ Excellent | ✅ Excellent |
+| German Language | ⚠️ Good | ✅ Excellent | ✅ Excellent |
+| Rate Limits | 30/min | 60/min | Depends on tier |
+| **Total Cost/Claim** | **$0** | **$0 (FREE!)** | **~$0.03** |
 
 ## Quick Start Commands
 
 ```powershell
 # 1. Set your Groq API key (minimum required)
-$env:GROQ_API_KEY = "gsk_your_key_here"
+$env:GROQ_API_KEY = "your_key_here"
 
-# 2. Set your OpenAI API key (recommended)
-$env:OPENAI_API_KEY = "sk-your_key_here"
+# 2. Set your Gemini API key (recommended - FREE!)
+$env:GEMINI_API_KEY = "your_key_here"
+
+# 3. Or set OpenAI API key (alternative)
+$env:OPENAI_API_KEY = "your_key_here"
 
 # 3. Check available models
 .\check-groq-models.ps1

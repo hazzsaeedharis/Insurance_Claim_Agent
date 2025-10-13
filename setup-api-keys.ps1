@@ -38,8 +38,22 @@ if ($groqKey) {
 
 Write-Host ""
 
+# Get Gemini API Key
+Write-Host "2. Gemini API Key (Recommended - FREE tier available!)" -ForegroundColor Yellow
+Write-Host "   Get it from: https://makersuite.google.com/app/apikey" -ForegroundColor Gray
+$geminiKey = Read-Host "   Enter your Gemini API key (or press Enter to skip)"
+
+if ($geminiKey) {
+    (Get-Content .env) -replace 'GEMINI_API_KEY=.*', "GEMINI_API_KEY=$geminiKey" | Set-Content .env
+    Write-Host "   [OK] Gemini API key saved" -ForegroundColor Green
+} else {
+    Write-Host "   [INFO] Skipping Gemini" -ForegroundColor Yellow
+}
+
+Write-Host ""
+
 # Get OpenAI API Key
-Write-Host "2. OpenAI API Key (Recommended for best quality)" -ForegroundColor Yellow
+Write-Host "3. OpenAI API Key (Alternative to Gemini)" -ForegroundColor Yellow
 Write-Host "   Get it from: https://platform.openai.com/api-keys" -ForegroundColor Gray
 $openaiKey = Read-Host "   Enter your OpenAI API key (or press Enter to skip)"
 
@@ -47,7 +61,7 @@ if ($openaiKey) {
     (Get-Content .env) -replace 'OPENAI_API_KEY=.*', "OPENAI_API_KEY=$openaiKey" | Set-Content .env
     Write-Host "   [OK] OpenAI API key saved" -ForegroundColor Green
 } else {
-    Write-Host "   [INFO] Skipping OpenAI - will use Groq for all operations" -ForegroundColor Yellow
+    Write-Host "   [INFO] Skipping OpenAI" -ForegroundColor Yellow
 }
 
 Write-Host ""

@@ -174,7 +174,8 @@ if __name__ == "__main__":
     # Check API keys
     print("\n🔑 API Key Status:")
     print(f"   - Groq API Key: {'✅ Set' if ai_config.groq_api_key else '❌ Missing'}")
-    print(f"   - OpenAI API Key: {'✅ Set' if ai_config.openai_api_key else '⚠️  Not set (using Groq fallback)'}")
+    print(f"   - Gemini API Key: {'✅ Set' if ai_config.gemini_api_key else '⚠️  Not set'}")
+    print(f"   - OpenAI API Key: {'✅ Set' if ai_config.openai_api_key else '⚠️  Not set'}")
     
     if not ai_config.groq_api_key:
         print("\n⚠️  Groq API key is required!")

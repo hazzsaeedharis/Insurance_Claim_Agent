@@ -13,6 +13,7 @@ import logging
 
 from groq import Groq
 import openai
+import google.generativeai as genai
 import pytesseract
 from PIL import Image
 import pdf2image
@@ -34,15 +35,24 @@ class DocumentProcessor:
     def __init__(self):
         """Initialize the document processor"""
         # Initialize Groq client
-        self.groq_client = Groq(api_key=ai_config.groq_api_key)
+        self.groq_client = Groq(api_key=ai_config.groq_api_key) if ai_config.groq_api_key else None
         
+        # Initialize Gemini if available (priority)
+        if ai_config.gemini_api_key:
+            genai.configure(api_key=ai_config.gemini_api_key)
+            self.use_gemini = True
+            self.use_openai = False
+            logger.info("Using Gemini API for document processing")
         # Initialize OpenAI if available
-        if ai_config.openai_api_key:
+        elif ai_config.openai_api_key:
             openai.api_key = ai_config.openai_api_key
             self.use_openai = True
+            self.use_gemini = False
+            logger.info("Using OpenAI API for document processing")
         else:
             self.use_openai = False
-            logger.warning("OpenAI API key not set, using Groq for all operations")
+            self.use_gemini = False
+            logger.info("Using Groq for document processing")
     
     def process_document(self, file_path: str, hints: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
@@ -146,7 +156,14 @@ class DocumentProcessor:
         """
         
         try:
-            if self.use_openai:
+            if self.use_gemini:
+                model = genai.GenerativeModel('gemini-1.5-flash')  # Fast model for classification
+                response = model.generate_content(
+                    f"You are a document classifier. Return only the document type.\n\n{prompt}",
+                    generation_config=genai.types.GenerationConfig(temperature=0)
+                )
+                doc_type = response.text.strip().lower().replace(" ", "_")
+            elif self.use_openai:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",  # Cheaper model for classification
                     messages=[
@@ -197,7 +214,21 @@ class DocumentProcessor:
         """
         
         try:
-            if self.use_openai:
+            if self.use_gemini:
+                # Use Gemini Pro for best extraction accuracy
+                model = genai.GenerativeModel(ai_config.gemini_llm_model)
+                response = model.generate_content(
+                    f"You are a medical document data extractor. Extract information precisely and return valid JSON only.\n\n{full_prompt}",
+                    generation_config=genai.types.GenerationConfig(temperature=0.1)
+                )
+                # Extract JSON from response
+                content = response.text
+                json_match = re.search(r'\{[\s\S]*\}', content)
+                if json_match:
+                    extracted = json.loads(json_match.group())
+                else:
+                    extracted = json.loads(content)
+            elif self.use_openai:
                 # Use GPT-4 for best extraction accuracy
                 response = openai.ChatCompletion.create(
                     model="gpt-4",

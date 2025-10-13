@@ -34,6 +34,7 @@ pdfplumber==0.9.0
 # AI and ML
 openai==1.12.0
 groq==0.4.2
+google-generativeai==0.3.2  # Gemini API
 chromadb==0.4.22
 langchain==0.1.5
 sentence-transformers==2.2.2  # For local embeddings if needed

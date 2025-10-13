@@ -12,13 +12,16 @@ class AIConfig(BaseSettings):
     # API Keys (automatically loaded from environment variables or .env file)
     groq_api_key: Optional[str] = Field(None, env='GROQ_API_KEY')
     openai_api_key: Optional[str] = Field(None, env='OPENAI_API_KEY')
+    gemini_api_key: Optional[str] = Field(None, env='GEMINI_API_KEY')
     pinecone_api_key: Optional[str] = Field(None, env='PINECONE_API_KEY')
     pinecone_environment: Optional[str] = Field(None, env='PINECONE_ENVIRONMENT')
     
     # Model Configuration
-    embedding_model: str = "text-embedding-3-small"  # Best for multilingual
-    llm_model: str = "gpt-4"  # Best accuracy
-    groq_model: str = "mixtral-8x7b-32768"  # Fast alternative
+    embedding_model: str = "text-embedding-3-small"  # OpenAI embedding
+    gemini_embedding_model: str = "models/embedding-001"  # Gemini embedding
+    llm_model: str = "gpt-4"  # OpenAI LLM
+    gemini_llm_model: str = "gemini-1.5-pro"  # Gemini LLM
+    groq_model: str = "mixtral-8x7b-32768"  # Groq LLM
     
     # Processing Configuration
     chunk_size: int = 500  # Characters per chunk

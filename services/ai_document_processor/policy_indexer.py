@@ -16,6 +16,7 @@ import pypdf2
 import pdfplumber
 from groq import Groq
 import openai
+import google.generativeai as genai
 
 from services.ai_document_processor.config import ai_config, POLICY_SECTIONS
 
@@ -53,16 +54,25 @@ class PolicyIndexer:
             # TODO: Add Pinecone support
             raise NotImplementedError("Pinecone support coming soon")
         
-        # Initialize LLMs
-        self.groq_client = Groq(api_key=ai_config.groq_api_key)
+        # Initialize LLMs (priority: Gemini > OpenAI > Groq)
+        self.groq_client = Groq(api_key=ai_config.groq_api_key) if ai_config.groq_api_key else None
         
+        # Initialize Gemini if available
+        if ai_config.gemini_api_key:
+            genai.configure(api_key=ai_config.gemini_api_key)
+            self.use_gemini = True
+            self.use_openai = False
+            logger.info("Using Gemini API for extraction and embeddings")
         # Initialize OpenAI if available
-        if ai_config.openai_api_key:
+        elif ai_config.openai_api_key:
             openai.api_key = ai_config.openai_api_key
             self.use_openai = True
+            self.use_gemini = False
+            logger.info("Using OpenAI API for extraction and embeddings")
         else:
             self.use_openai = False
-            logger.warning("OpenAI API key not set, using Groq for all operations")
+            self.use_gemini = False
+            logger.warning("No premium API key set. Using Groq only (limited features)")
     
     def extract_text_from_pdf(self, pdf_path: str) -> List[Dict[str, Any]]:
         """Extract text from PDF with page information"""
@@ -193,7 +203,24 @@ class PolicyIndexer:
         """
         
         try:
-            if self.use_openai:
+            if self.use_gemini:
+                # Use Gemini Pro for best accuracy
+                model = genai.GenerativeModel(ai_config.gemini_llm_model)
+                response = model.generate_content(
+                    f"You are an insurance policy analyst. Extract information precisely.\n\n{prompt}",
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.1,
+                        candidate_count=1,
+                    )
+                )
+                # Extract JSON from response
+                text = response.text
+                json_match = re.search(r'\{[\s\S]*\}', text)
+                if json_match:
+                    metadata = json.loads(json_match.group())
+                else:
+                    metadata = json.loads(text)
+            elif self.use_openai:
                 # Use GPT-4 for best accuracy
                 response = openai.ChatCompletion.create(
                     model="gpt-4",
@@ -225,8 +252,19 @@ class PolicyIndexer:
             return {}
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for texts using OpenAI or fallback"""
-        if self.use_openai:
+        """Generate embeddings for texts using Gemini, OpenAI, or fallback"""
+        if self.use_gemini:
+            # Use Gemini embeddings (excellent for multilingual)
+            embeddings = []
+            for text in texts:
+                result = genai.embed_content(
+                    model=ai_config.gemini_embedding_model,
+                    content=text,
+                    task_type="retrieval_document"
+                )
+                embeddings.append(result['embedding'])
+            return embeddings
+        elif self.use_openai:
             # Use OpenAI embeddings (best quality for multilingual)
             response = openai.Embedding.create(
                 model=ai_config.embedding_model,
@@ -236,8 +274,8 @@ class PolicyIndexer:
         else:
             # TODO: Implement fallback embedding model
             # For now, we'll use a placeholder
-            logger.warning("OpenAI embeddings not available, using placeholder")
-            return [[0.0] * 1536 for _ in texts]  # Placeholder embeddings
+            logger.warning("No premium embeddings available, using placeholder")
+            return [[0.0] * 768 for _ in texts]  # Placeholder embeddings (Gemini size)
     
     def index_policy_document(self, pdf_path: str, policy_id: str, policy_name: str) -> Dict[str, Any]:
         """Main method to index a policy document"""
