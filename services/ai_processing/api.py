@@ -62,7 +62,6 @@ class DocumentProcessRequest(BaseModel):
 
 class ClaimAnalysisRequest(BaseModel):
     """Request model for claim analysis"""
-    claim_id: str = Field(..., description="Claim ID to analyze")
     policy_id: str = Field(..., description="Policy ID to match against")
     customer_id: str = Field(..., description="Customer ID for deductible tracking")
     
