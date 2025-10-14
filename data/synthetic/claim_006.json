@@ -1,0 +1,33 @@
+{
+  "claim_id": "CLM-EB726B5B",
+  "customer_id": "CUST-770910",
+  "policy_number": "POL-9603365",
+  "policy_type": "tk_statutory",
+  "items": [
+    {
+      "date": "2025-10-01",
+      "provider": "Praxis Dr. Weber",
+      "code": "01010",
+      "description": "Allgemeine Beratung",
+      "net_amount": 46.82,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-22",
+      "provider": "Praxis Dr. Becker",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 91.29,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-10-06T18:24:34.827463",
+  "total_claimed": 138.11,
+  "customer_info": {
+    "name": "Peter Wagner",
+    "dob": "1974-03-23",
+    "address": "Musterstraße 61, 92957 Musterstadt"
+  }
+}

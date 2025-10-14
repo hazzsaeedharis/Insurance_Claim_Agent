@@ -1,0 +1,60 @@
+# Core Dependencies
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Storage
+minio
+pinecone
+
+# Redis
+redis
+
+# Message Queue
+pika  # RabbitMQ client
+
+# Authentication
+pyjwt
+python-keycloak
+httpx  # Required by python-keycloak
+
+# OCR and Document Processing
+pytesseract
+pillow
+pdf2image
+opencv-python
+PyPDF2
+pdfplumber
+
+# AI and ML
+openai
+groq
+google-generativeai  # Gemini API (optional)
+pinecone
+langchain
+sentence-transformers  # For local embeddings (FREE, no API needed)
+transformers  # For Hugging Face models
+torch  # Required for transformers
+tiktoken  # For token counting
+
+# API and Networking
+requests
+aiofiles
+
+# Utilities
+python-multipart  # For file uploads
+python-dateutil
+pytz
+
+# Development
+pytest
+pytest-asyncio
+black
+flake8
+

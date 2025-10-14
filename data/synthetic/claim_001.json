@@ -1,0 +1,49 @@
+{
+  "claim_id": "CLM-7C638EEF",
+  "customer_id": "CUST-921736",
+  "policy_number": "POL-9170211",
+  "policy_type": "hallesche_nk_select_s",
+  "items": [
+    {
+      "date": "2025-09-15",
+      "provider": "Praxis Dr. Schmidt",
+      "code": "01030",
+      "description": "Körperliche Untersuchung",
+      "net_amount": 22.2,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-25",
+      "provider": "Praxis Dr. Weber",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 71.82,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-27",
+      "provider": "Praxis Dr. Wagner",
+      "code": "02100",
+      "description": "Labor Grunduntersuchung",
+      "net_amount": 27.09,
+      "currency": "EUR"
+    },
+    {
+      "date": "2025-09-21",
+      "provider": "Praxis Dr. Becker",
+      "code": "01020",
+      "description": "Ausführliche Beratung",
+      "net_amount": 62.66,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-10-08T18:24:34.824941",
+  "total_claimed": 183.77,
+  "customer_info": {
+    "name": "Peter Weber",
+    "dob": "1997-04-27",
+    "address": "Musterstraße 40, 31046 Musterstadt"
+  }
+}

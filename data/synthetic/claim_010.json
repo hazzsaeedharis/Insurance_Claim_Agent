@@ -1,0 +1,25 @@
+{
+  "claim_id": "CLM-94A4C5B9",
+  "customer_id": "CUST-359195",
+  "policy_number": "POL-7039243",
+  "policy_type": "hallesche_nk_select_s",
+  "items": [
+    {
+      "date": "2025-09-23",
+      "provider": "Praxis Dr. Wagner",
+      "code": "02100",
+      "description": "Labor Grunduntersuchung",
+      "net_amount": 31.68,
+      "currency": "EUR"
+    }
+  ],
+  "documents": [],
+  "status": "received",
+  "created_at": "2025-10-08T18:24:34.828876",
+  "total_claimed": 31.68,
+  "customer_info": {
+    "name": "Anna Weber",
+    "dob": "1957-07-25",
+    "address": "Musterstraße 4, 58113 Musterstadt"
+  }
+}

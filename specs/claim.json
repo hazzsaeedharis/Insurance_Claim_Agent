@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://insurance-claims.api/schemas/claim.json",
+  "title": "Insurance Claim",
+  "description": "Insurance claim submission and processing schema",
+  "type": "object",
+  "required": ["claim_id", "customer_id", "status", "created_at"],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "pattern": "^CLM-[A-Z0-9]{8}$",
+      "description": "Unique claim identifier"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Customer/policyholder identifier"
+    },
+    "policy_number": {
+      "type": "string",
+      "description": "Insurance policy number"
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": ["outpatient", "inpatient", "dental", "vision", "pharmacy", "emergency"],
+      "description": "Type of insurance claim"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "submitted", "under_review", "approved", "rejected", "paid", "appealed", "closed"],
+      "description": "Current claim status"
+    },
+    "items": {
+      "type": "array",
+      "description": "Individual claim line items",
+      "items": {
+        "type": "object",
+        "required": ["date", "provider", "code", "net_amount", "currency"],
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Healthcare provider name"
+          },
+          "code": {
+            "type": "string",
+            "description": "Procedure or diagnosis code"
+          },
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "net_amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "gross_amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "covered_amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "deductible_applied": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "description": "Attached documents",
+      "items": {
+        "type": "object",
+        "required": ["document_id", "document_type", "uploaded_at"],
+        "properties": {
+          "document_id": {
+            "type": "string"
+          },
+          "document_type": {
+            "type": "string",
+            "enum": ["receipt", "prescription", "referral", "medical_report", "invoice", "other"]
+          },
+          "filename": {
+            "type": "string"
+          },
+          "storage_key": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verified": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "total_amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total claim amount"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "default": "EUR"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "processed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "adjuster_id": {
+      "type": "string",
+      "description": "Assigned adjuster ID"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "note_id": {
+            "type": "string"
+          },
+          "author_id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": ["internal", "customer", "all"]
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "fraud_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "auto_approved": {
+          "type": "boolean"
+        },
+        "processing_time_seconds": {
+          "type": "number"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["web", "mobile", "api", "email", "phone"]
+        }
+      }
+    }
+  }
+}
