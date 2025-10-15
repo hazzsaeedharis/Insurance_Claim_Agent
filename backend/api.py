@@ -190,6 +190,95 @@ async def index_policy(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/policies")
+async def list_policies():
+    """
+    List all indexed policies.
+    
+    Returns:
+        List of policy IDs and names
+    """
+    try:
+        # Query Pinecone to get unique policy IDs
+        # This is a simple implementation - in production you'd want a separate metadata store
+        from collections import defaultdict
+        
+        # Get some vectors to extract policy metadata
+        index = policy_indexer.index
+        
+        # Query with a generic search to get policy metadata
+        results = index.query(
+            vector=[0.0] * 384,  # Dummy vector
+            top_k=1000,
+            include_metadata=True
+        )
+        
+        # Extract unique policies
+        policies_dict = {}
+        for match in results.matches:
+            if 'policy_id' in match.metadata:
+                policy_id = match.metadata['policy_id']
+                if policy_id not in policies_dict:
+                    policies_dict[policy_id] = {
+                        "policy_id": policy_id,
+                        "policy_name": match.metadata.get('policy_name', policy_id),
+                        "indexed_at": match.metadata.get('indexed_at', 'Unknown')
+                    }
+        
+        return {
+            "policies": list(policies_dict.values()),
+            "count": len(policies_dict)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error listing policies: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/policies/{policy_id}")
+async def delete_policy(policy_id: str):
+    """
+    Delete a policy from the index.
+    
+    Args:
+        policy_id: Policy to delete
+        
+    Returns:
+        Success message
+    """
+    try:
+        index = policy_indexer.index
+        
+        # Delete all vectors with this policy_id
+        # First, find all vector IDs with this policy_id
+        results = index.query(
+            vector=[0.0] * 384,
+            top_k=10000,
+            include_metadata=True,
+            filter={"policy_id": policy_id}
+        )
+        
+        # Extract IDs to delete
+        ids_to_delete = [match.id for match in results.matches]
+        
+        if ids_to_delete:
+            index.delete(ids=ids_to_delete)
+            logger.info(f"Deleted {len(ids_to_delete)} vectors for policy {policy_id}")
+            return {
+                "success": True,
+                "message": f"Deleted policy {policy_id}",
+                "vectors_deleted": len(ids_to_delete)
+            }
+        else:
+            raise HTTPException(status_code=404, detail=f"Policy {policy_id} not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting policy: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/policies/{policy_id}/search")
 async def search_policy(
     policy_id: str,

@@ -6,6 +6,7 @@ let claimsCounter = 247;
 let approvedCounter = 198;
 let pendingCounter = 32;
 let rejectedCounter = 17;
+let policies = []; // Store loaded policies
 
 // Smooth scroll function
 function scrollToSection(sectionId) {
@@ -40,6 +41,190 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     alert('Login functionality would connect to Keycloak JWT authentication');
     closeLogin();
 });
+
+// ============================================================================
+// POLICY MANAGEMENT FUNCTIONS
+// ============================================================================
+
+// Load policies from API
+async function loadPolicies() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/policies`);
+        if (!response.ok) {
+            throw new Error('Failed to load policies');
+        }
+        
+        const data = await response.json();
+        policies = data.policies || [];
+        
+        // Update dropdown in claim form
+        updatePolicyDropdown();
+        
+        // Update policies list
+        updatePoliciesList();
+        
+        return policies;
+    } catch (error) {
+        console.error('Error loading policies:', error);
+        return [];
+    }
+}
+
+// Update policy selector dropdown
+function updatePolicyDropdown() {
+    const policySelect = document.getElementById('policySelect');
+    
+    if (!policySelect) return;
+    
+    policySelect.innerHTML = '';
+    
+    if (policies.length === 0) {
+        policySelect.innerHTML = '<option value="">No policies available - Please upload a policy first</option>';
+        return;
+    }
+    
+    // Add default option
+    policySelect.innerHTML = '<option value="">-- Select a policy --</option>';
+    
+    // Add policy options
+    policies.forEach(policy => {
+        const option = document.createElement('option');
+        option.value = policy.policy_id;
+        option.textContent = `${policy.policy_name} (${policy.policy_id})`;
+        policySelect.appendChild(option);
+    });
+    
+    // Auto-select first policy if available
+    if (policies.length > 0) {
+        policySelect.value = policies[0].policy_id;
+    }
+}
+
+// Update policies list display
+function updatePoliciesList() {
+    const policiesList = document.getElementById('policiesList');
+    
+    if (!policiesList) return;
+    
+    if (policies.length === 0) {
+        policiesList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-folder-open" style="font-size: 48px; color: #9ca3af; margin-bottom: 10px;"></i>
+                <p style="color: #6b7280;">No policies indexed yet</p>
+                <small style="color: #9ca3af;">Upload a policy document to get started</small>
+            </div>
+        `;
+        return;
+    }
+    
+    policiesList.innerHTML = policies.map(policy => `
+        <div class="policy-item">
+            <div class="policy-info">
+                <h4>${policy.policy_name}</h4>
+                <span class="policy-id">${policy.policy_id}</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deletePolicy('${policy.policy_id}')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `).join('');
+}
+
+// Policy upload form submission
+if (document.getElementById('policyUploadForm')) {
+    document.getElementById('policyUploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const policyId = document.getElementById('policyId').value.trim();
+        const policyName = document.getElementById('policyName').value.trim();
+        const policyFile = document.getElementById('policyFile').files[0];
+        const statusDiv = document.getElementById('policyUploadStatus');
+        
+        if (!policyFile) {
+            alert('Please select a PDF file');
+            return;
+        }
+        
+        // Show loading status
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading and indexing policy... This may take a moment.';
+        statusDiv.style.color = '#3b82f6';
+        
+        try {
+            const formData = new FormData();
+            formData.append('policy_id', policyId);
+            formData.append('policy_name', policyName);
+            formData.append('file', policyFile);
+            
+            const response = await fetch(`${API_BASE_URL}/api/policies/index`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || 'Upload failed');
+            }
+            
+            const result = await response.json();
+            
+            // Show success
+            statusDiv.style.color = '#10b981';
+            statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${result.message}`;
+            
+            // Reset form
+            e.target.reset();
+            document.querySelector('#policyFile + label span').textContent = 'Choose PDF file';
+            
+            // Reload policies
+            await loadPolicies();
+            
+            // Hide status after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+            
+        } catch (error) {
+            console.error('Error uploading policy:', error);
+            statusDiv.style.color = '#ef4444';
+            statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`;
+        }
+    });
+    
+    // File input label update
+    document.getElementById('policyFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || 'Choose PDF file';
+        document.querySelector('#policyFile + label span').textContent = fileName;
+    });
+}
+
+// Delete policy
+async function deletePolicy(policyId) {
+    if (!confirm(`Are you sure you want to delete policy "${policyId}"?\n\nThis will remove all indexed data for this policy.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/policies/${policyId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+            throw new Error(errorData.detail || 'Delete failed');
+        }
+        
+        const result = await response.json();
+        alert(`✓ ${result.message}\n\nVectors deleted: ${result.vectors_deleted}`);
+        
+        // Reload policies
+        await loadPolicies();
+        
+    } catch (error) {
+        console.error('Error deleting policy:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
 
 // UPDATED: Claim form submission with REAL API
 document.getElementById('claimForm').addEventListener('submit', async function(e) {
@@ -106,13 +291,19 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         step3.querySelector('p').textContent = 'Matching against policy...';
         await animateStep(3);
         
+        // Get selected policy
+        const selectedPolicy = document.getElementById('policySelect').value;
+        if (!selectedPolicy) {
+            throw new Error('Please select a policy first');
+        }
+        
         const analysisResponse = await fetch(`${API_BASE_URL}/api/claims/analyze/${claimId}`, { // Use the same claim ID
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                policy_id: 'HALLESCHE_NK_SELECT_S',
+                policy_id: selectedPolicy,
                 customer_id: 'DEMO-CUSTOMER'
             })
         });
@@ -298,6 +489,9 @@ function updateChart() {
 
 // Initialize chart when page loads
 window.addEventListener('DOMContentLoaded', function() {
+    // Load policies on page load
+    loadPolicies();
+    
     // Initialize chart if Chart.js is loaded
     if (typeof Chart !== 'undefined') {
         initChart();

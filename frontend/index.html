@@ -20,6 +20,7 @@
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#features" class="nav-link">Features</a></li>
                 <li><a href="#demo" class="nav-link">Demo</a></li>
+                <li><a href="#policies" class="nav-link">Policies</a></li>
                 <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
                 <li><a href="#" class="nav-link btn-login" onclick="showLogin()">Login</a></li>
             </ul>
@@ -179,6 +180,14 @@
                         </div>
                         
                         <div class="form-group">
+                            <label>Select Policy <span style="color: #ef4444;">*</span></label>
+                            <select id="policySelect" required>
+                                <option value="">Loading policies...</option>
+                            </select>
+                            <small style="color: #6b7280; font-size: 0.85em;">Choose which policy to analyze against</small>
+                        </div>
+                        
+                        <div class="form-group">
                             <label>Claim Type</label>
                             <select id="claimType" required>
                                 <option value="outpatient">Outpatient Treatment</option>
@@ -283,6 +292,61 @@
                                 <span>Processing Time:</span>
                                 <strong id="processingTime">-</strong>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Policies Section -->
+    <section id="policies" class="policies-section">
+        <div class="container">
+            <h2 class="section-title">Policy Management</h2>
+            <p class="section-subtitle">Upload and manage insurance policy documents</p>
+            
+            <div class="policies-container">
+                <!-- Upload Policy Card -->
+                <div class="policy-card">
+                    <h3><i class="fas fa-upload"></i> Upload Policy</h3>
+                    <form id="policyUploadForm" class="policy-form">
+                        <div class="form-group">
+                            <label>Policy ID <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="policyId" placeholder="e.g., HALLESCHE_NK_SELECT_S" required>
+                            <small>Unique identifier for this policy</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Policy Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="policyName" placeholder="e.g., Hallesche NK.select S" required>
+                            <small>Human-readable policy name</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Policy Document (PDF) <span style="color: #ef4444;">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" id="policyFile" accept=".pdf" required>
+                                <label for="policyFile">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>Choose PDF file</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload & Index Policy
+                        </button>
+                        
+                        <div id="policyUploadStatus" class="upload-status" style="display: none; margin-top: 15px;"></div>
+                    </form>
+                </div>
+                
+                <!-- Indexed Policies List -->
+                <div class="policy-card">
+                    <h3><i class="fas fa-list"></i> Indexed Policies</h3>
+                    <div id="policiesList" class="policies-list">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i> Loading policies...
                         </div>
                     </div>
                 </div>
