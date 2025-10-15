@@ -1,0 +1,30 @@
+# Core Dependencies
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
+
+# AI/ML
+openai
+groq
+google-generativeai
+langchain
+sentence-transformers
+tiktoken
+
+# Document Processing
+pypdf2
+pdfplumber
+pdf2image
+pytesseract
+pillow
+
+# Vector Database
+pinecone
+
+# Utilities
+python-dotenv
+aiofiles
+requests
+numpy
