@@ -1,60 +1,30 @@
 # Core Dependencies
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 pydantic-settings
+python-multipart
 
-# Database
-sqlalchemy
-psycopg2-binary
-alembic
-
-# Storage
-minio
-pinecone
-
-# Redis
-redis
-
-# Message Queue
-pika  # RabbitMQ client
-
-# Authentication
-pyjwt
-python-keycloak
-httpx  # Required by python-keycloak
-
-# OCR and Document Processing
-pytesseract
-pillow
-pdf2image
-opencv-python
-PyPDF2
-pdfplumber
-
-# AI and ML
+# AI/ML
 openai
 groq
-google-generativeai  # Gemini API (optional)
-pinecone
+google-generativeai
 langchain
-sentence-transformers  # For local embeddings (FREE, no API needed)
-transformers  # For Hugging Face models
-torch  # Required for transformers
-tiktoken  # For token counting
+sentence-transformers
+tiktoken
 
-# API and Networking
-requests
-aiofiles
+# Document Processing
+pypdf2
+pdfplumber
+pdf2image
+pytesseract
+pillow
+
+# Vector Database
+pinecone
 
 # Utilities
-python-multipart  # For file uploads
-python-dateutil
-pytz
-
-# Development
-pytest
-pytest-asyncio
-black
-flake8
-
+python-dotenv
+aiofiles
+requests
+numpy

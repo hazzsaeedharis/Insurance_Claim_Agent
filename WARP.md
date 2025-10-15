@@ -2,260 +2,107 @@
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
-## Project Overview
+## Commands
 
-InsureClaim AI is a production-ready, AI-powered insurance claims processing platform built with microservices architecture. It reduces claim processing time by 85% through automated document processing, AI-powered validation, and intelligent settlement calculations.
+### Development
+- **Start server**: `py run.py` (main entry point with startup checks and banner)
+- **Start with auto-open**: `py run.py --open` (opens API docs in browser)
+- **Direct FastAPI**: `uvicorn backend.api:app --host 0.0.0.0 --port 8000 --reload`
 
-## Common Development Commands
+### Dependencies
+- **Install**: `pip install -r requirements.txt`
+- **Test basic import**: `py test.py` (imports backend.api module)
+
+### API Endpoints
+- **Health check**: `GET /health` 
+- **API docs**: `GET /docs`
+- **Frontend**: Open `frontend/index.html` in browser
 
 ### Environment Setup
-```powershell
-# Initial setup (creates virtual environment, installs dependencies)
-.\setup.ps1
-
-# Load environment variables from .env file
-. .\load-env.ps1
-
-# Setup API keys interactively
-.\setup-api-keys.ps1
+Create `.env` file with at least one AI service:
+```
+GROQ_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here  # optional
+GEMINI_API_KEY=your_key_here  # optional  
+PINECONE_API_KEY=your_key_here  # optional for policy indexing
 ```
 
-### Testing & Development
-```powershell
-# Test AI processing pipeline with Groq API
-python test_ai_processing.py
+## Architecture
 
-# Test specific Groq models
-.\check-groq-models.ps1
+### Core Processing Pipeline
+The system follows a 3-stage AI processing pipeline:
 
-# Run all unit tests
-.\test_all.ps1
+1. **Document Extraction** (`backend/processors/document.py`)
+   - OCR + AI extraction of medical invoices, prescriptions, reports
+   - Uses Tesseract OCR with German+English support
+   - AI models prioritize: Gemini > OpenAI > Groq
+   - Returns structured JSON with confidence scores
 
-# Test system integration
-.\test_system.ps1
+2. **Policy Matching** (`backend/processors/policy.py`) 
+   - RAG-based policy document indexing with Pinecone vector DB
+   - Chunks policy PDFs into searchable sections
+   - Local embeddings (sentence-transformers) as default (free)
+   - Supports Gemini/OpenAI embeddings for premium accuracy
 
-# Test individual components
-python test_document_extraction.py
-python test_pinecone.py
-```
+3. **Claim Analysis** (`backend/processors/claim.py`)
+   - Matches extracted claims against policy coverage
+   - Calculates reimbursements with deductibles and limits
+   - Generates detailed justifications and warnings
 
-### Running Services
+### AI Service Configuration
+Services are prioritized by quality and cost:
+- **Primary**: Gemini (gemini-1.5-flash) - best multilingual support
+- **Fallback**: OpenAI (gpt-4) - premium accuracy 
+- **Default**: Groq (llama-3.3-70b-versatile) - fast and free
 
-#### Individual Service Development
-```powershell
-# Start individual components for development
-.\run-components.ps1
+### Data Models (`backend/models.py`)
+All request/response models use Pydantic with clear field validation:
+- PolicyIndexRequest/Response
+- DocumentExtractRequest/Response  
+- ClaimAnalysisRequest/Response
+- Internal models: ExtractedService, PolicyMatch, ReimbursementCalculation
 
-# Run specific service (example)
-python services/ai_processing/api.py
-python services/claims/api.py
-```
+### Configuration (`backend/config.py`)
+Centralized settings with environment variable loading:
+- AI model selection and API keys
+- Document processing limits and file types
+- Vector DB configuration (Pinecone settings)
+- Medical code patterns (GOÄ, ICD, PZN, OPS)
 
-#### Full Infrastructure
-```powershell
-# Start complete Docker infrastructure
-.\run-docker.ps1
+### Frontend Integration
+JavaScript frontend (`frontend/app.js`) connects to FastAPI backend:
+- Real-time claim processing with pipeline visualization
+- Detailed justification display with confidence scores
+- System health monitoring via `/health` endpoint
 
-# Start with rebuild
-.\run-docker.ps1 -Build
+## File Processing
+- **Supported formats**: PDF, PNG, JPG, JPEG, TIFF
+- **Max file size**: 10MB (configurable)
+- **OCR languages**: German + English
+- **Medical codes**: Automatic detection of GOÄ, ICD-10, PZN codes
 
-# Start in background
-.\run-docker.ps1 -Detached
+## Vector Database
+- **Default**: Pinecone with cosine similarity
+- **Index**: insurance-policies (384-dim for sentence transformers)
+- **Chunking**: 1000 chars with 200 char overlap
+- **Local fallback**: sentence-transformers (all-MiniLM-L6-v2)
 
-# Stop all services
-.\run-docker.ps1 -Action down
+## Testing
+The system includes basic module import testing. For claim processing:
+1. Start server: `python run.py`
+2. Upload test document via frontend or API
+3. Check `/health` endpoint for service status
+4. Use `/docs` for interactive API testing
 
-# View service status
-.\run-docker.ps1 -Action status
+## Error Handling
+- Graceful fallbacks when AI services are unavailable
+- Comprehensive validation with helpful error messages
+- Default coverage rules when policy matching fails
+- File cleanup for temporary document uploads
 
-# View logs
-.\run-docker.ps1 -Action logs
-```
-
-### Docker Services Access Points
-When running full infrastructure, services are available at:
-- **Keycloak Admin**: http://localhost:8080 (admin/admin123)
-- **PostgreSQL**: localhost:5432 (insurance_admin/dev_password_123)
-- **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin123)
-- **Redis**: localhost:6379
-- **RabbitMQ Management**: http://localhost:15672 (rabbitmq/rabbitmq123)
-- **Health Check**: http://localhost:8000/health
-- **AI Processing API**: http://localhost:8005/docs
-
-## High-Level Architecture
-
-### Multi-Agent System Design
-The system implements a sophisticated multi-agent architecture with specialized AI agents:
-
-1. **Document Intake Agent**: Classifies documents and routes to specialists
-2. **Medical Invoice Agent**: Extracts medical entities with specialized NER
-3. **Policy Validation Agent**: Uses RAG system to validate claims against policies
-4. **Fraud Detection Agent**: ML-powered fraud detection with explainable AI
-5. **Settlement Calculation Agent**: Multi-step reasoning for settlement amounts
-
-### Microservices Architecture
-```
-Insurance_Claim_Agent/
-├── services/
-│   ├── ai_processing/       # Main AI processing service (FastAPI)
-│   ├── claims/             # Claims management API
-│   ├── documents/          # Document storage service (MinIO)
-│   ├── ocr/               # OCR processing service (Tesseract)
-│   ├── processing/        # Document classification & extraction
-│   └── common/            # Shared utilities (auth, logging, metrics)
-├── services/ai_document_processor/  # Core AI components
-│   ├── policy_indexer.py   # RAG system for policy documents
-│   ├── document_processor.py # AI-powered document extraction
-│   └── claim_analyzer.py   # Claim validation and settlement calculation
-├── infra/                  # Infrastructure & deployment
-│   ├── docker-compose.yml  # Full stack infrastructure
-│   └── k8s/               # Kubernetes manifests
-└── data/                   # Policy documents and samples
-```
-
-### AI/ML Stack Integration
-- **LLM APIs**: Groq (primary), OpenAI, Gemini (configurable)
-- **Embeddings**: Local Sentence Transformers (free) or OpenAI API
-- **Vector Database**: Pinecone for policy document RAG
-- **OCR**: Tesseract with PyTesseract integration
-- **Document Processing**: Multi-format support (PDF, images)
-
-### Key Design Patterns
-
-#### RAG (Retrieval Augmented Generation)
-The `PolicyIndexer` implements semantic search over policy documents:
-- Chunks policy PDFs into sections
-- Creates embeddings for semantic similarity
-- Supports contextual claim validation
-
-#### Agent Orchestration
-The `ClaimProcessingWorkflow` coordinates multiple agents:
-- State machine-based workflow management
-- Parallel processing where possible
-- Memory and context management between agents
-
-#### Multi-Modal Processing
-Handles various document types:
-- PDF processing with pdfplumber
-- Image OCR with Tesseract
-- Structured data extraction with AI
-
-## Environment Configuration
-
-### Required Environment Variables
-```env
-# Core AI API (required for main functionality)
-GROQ_API_KEY=your_groq_key_here
-
-# Embedding strategy
-EMBEDDING_STRATEGY=local  # or 'openai' if you have OPENAI_API_KEY
-
-# Optional AI providers
-OPENAI_API_KEY=your_openai_key  # For better embeddings
-GEMINI_API_KEY=your_gemini_key  # Alternative LLM
-
-# Vector Database (for policy RAG)
-PINECONE_API_KEY=your_pinecone_key  # Optional, can use local ChromaDB
-```
-
-### Free Setup (No Credit Card Required)
-The system can run completely free using:
-- Groq API (free tier: 100 requests/minute)
-- Local Sentence Transformers for embeddings
-- Local ChromaDB instead of Pinecone
-- Tesseract OCR (local processing)
-
-## Key Components Deep Dive
-
-### AI Document Processor (`services/ai_document_processor/`)
-The core AI functionality is centralized here:
-
-- **PolicyIndexer**: RAG system that indexes policy documents for semantic search
-- **DocumentProcessor**: Extracts structured data from various document formats
-- **ClaimAnalyzer**: Validates claims against policies and calculates settlements
-
-These components use a multi-step AI approach:
-1. Document classification and routing
-2. OCR and text extraction
-3. Entity extraction with specialized prompts
-4. Policy matching with semantic search
-5. Settlement calculation with business logic
-
-### Authentication & Security (`auth/`)
-Implements JWT-based authentication with role-based access control (RBAC):
-- 7 predefined roles (Customer, Adjuster, Manager, etc.)
-- Middleware for API endpoint protection
-- Integration with Keycloak for enterprise auth
-
-### Common Services (`services/common/`)
-Shared utilities across microservices:
-- **BaseService**: FastAPI service template with health checks
-- **Database**: SQLAlchemy models and connections
-- **Logger**: Centralized structured logging
-- **Metrics**: Prometheus metrics collection
-
-## Development Workflow
-
-### Typical Development Session
-1. **Environment Setup**: Run `.\setup.ps1` once
-2. **Load Environment**: `. .\load-env.ps1` per session
-3. **Test AI Pipeline**: `python test_ai_processing.py`
-4. **Develop Services**: Start individual services as needed
-5. **Integration Testing**: Use `.\test_system.ps1`
-
-### Adding New Document Types
-1. Extend document classification prompts in `DocumentProcessor`
-2. Add specialized extraction logic for new document structure
-3. Update the routing logic in `DocumentIntakeAgent`
-4. Test with sample documents
-
-### Extending AI Capabilities
-1. **New Agent Types**: Follow the agent pattern in `MULTI_AGENT_ARCHITECTURE.md`
-2. **Custom Models**: Configure in `services/ai_document_processor/config.py`
-3. **Enhanced RAG**: Modify `PolicyIndexer` for better retrieval
-
-## Important Notes
-
-### PowerShell Environment
-The project is optimized for Windows PowerShell development:
-- PowerShell scripts auto-load `.env` files
-- Python scripts use `python-dotenv` for environment variables
-- Docker integration through PowerShell scripts
-
-### Performance Characteristics
-- **Processing Speed**: ~30 seconds average per claim
-- **OCR Accuracy**: 95%+ for clear documents
-- **Automation Rate**: 85% claims processed without human intervention
-- **Concurrent Users**: 1000+ supported through microservices
-
-### Production Deployment
-The system is designed for production with:
-- Kubernetes manifests in `infra/k8s/`
-- Health checks on all services
-- Prometheus metrics collection
-- Structured logging for observability
-- GDPR and BaFin compliance considerations
-
-### Troubleshooting Common Issues
-
-#### "GROQ_API_KEY not found"
-Solution: Load environment with `. .\load-env.ps1` or check `.env` file exists
-
-#### OCR Processing Errors
-Solution: Install Tesseract OCR following `INSTALL_TESSERACT.md`
-
-#### Docker Services Not Starting
-Solution: Check Docker Desktop is running and ports aren't in use
-
-#### Embedding Model Downloads
-First run downloads ~90MB Sentence Transformers model (one-time)
-
-## Business Context
-
-This is a production-ready insurance platform with real customers:
-- **Hallesche Insurance**: 50,000 claims/year
-- **TK (Techniker Krankenkasse)**: POC phase
-- Target: 85% automation rate, 60% cost reduction
-- Compliance: GDPR, BaFin regulations
-
-The codebase demonstrates enterprise-grade AI implementation with practical business applications in the German insurance market.
+## Development Notes
+- Clean code principles: single responsibility, clear naming, no duplication
+- All processors can work with any of the three AI services
+- In-memory cache for demo (would use database in production)
+- CORS enabled for frontend development
+- Comprehensive logging throughout the system

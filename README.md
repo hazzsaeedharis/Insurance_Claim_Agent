@@ -1,212 +1,133 @@
-# 🏥 InsureClaim AI - Revolutionizing Insurance Claims Processing
+# Insurance Claim Processing System
 
-<p align="center">
-  <strong>AI-Powered Insurance Claims Automation Platform</strong><br>
-  <em>Reducing claims processing time by 85% and operational costs by 60%</em>
-</p>
+AI-powered document processing and claim analysis system for insurance companies.
 
----
+## Features
 
-## 🚀 Executive Summary
+- 📄 **Document Extraction** - Extract data from PDFs and images using OCR + AI
+- 🤖 **AI Analysis** - Intelligent claim processing using Groq/OpenAI/Gemini
+- 📊 **Policy Matching** - RAG-based policy coverage verification
+- 💰 **Auto Calculation** - Transparent reimbursement calculations
+- 🌐 **Web Interface** - Clean, modern UI for easy interaction
 
-InsureClaim AI is a production-ready, AI-powered insurance claims processing platform that transforms how insurance companies handle claims. By leveraging advanced OCR, machine learning, and intelligent automation, we reduce claim processing time from days to minutes while maintaining 99.9% accuracy.
+## Quick Start
 
-### 📈 Key Metrics
+### 1. Install Dependencies
 
-- **85% Faster Processing**: From 3-5 days to 30 minutes average
-- **60% Cost Reduction**: Automated processing reduces manual labor costs
-- **95% Automation Rate**: Most claims processed without human intervention
-- **99.9% Accuracy**: AI-powered validation and fraud detection
-- **4.8/5 Customer Satisfaction**: Real-time tracking and faster payouts
-
-## 💰 Market Opportunity
-
-### Total Addressable Market (TAM)
-- **Global Insurance Claims Processing**: $65B annual market
-- **German Insurance Market**: €200B premiums, 90M+ policies
-- **Digital Transformation Budget**: Growing 23% YoY
-
-### Problem We Solve
-- Insurance companies process **millions of claims annually**
-- **70% of costs** are operational (manual processing)
-- Average claim takes **3-5 days** to process
-- **15% fraud rate** costs insurers billions annually
-- Poor customer experience leads to **30% churn rate**
-
-## 🎯 Our Solution
-
-### Core Features
-
-#### 1. **Intelligent Document Processing**
-- Multi-language OCR (German, English)
-- 95%+ accuracy on handwritten documents
-- Automatic classification and data extraction
-- Support for all document types (PDFs, images, scans)
-
-#### 2. **AI-Powered Decision Engine**
-- Policy validation in real-time
-- Automatic coverage calculation
-- Smart approval for claims under €5,000
-- ML-based fraud detection (reduces fraud by 40%)
-
-#### 3. **Seamless Integration**
-- REST APIs for existing systems
-- SEPA payment integration
-- SAP/Oracle compatibility
-- Compliant with GDPR and BaFin regulations
-
-#### 4. **Real-Time Analytics**
-- Live dashboards for management
-- Predictive analytics for risk assessment
-- Performance metrics and KPIs
-- Fraud pattern detection
-
-## 💻 Live Demo
-
-### Quick Start (5 minutes)
 ```bash
-# Clone and start the platform
-git clone https://github.com/your-repo/insurance-claim-agent
-cd insurance-claim-agent
-./setup.ps1
-./run-docker.ps1
+pip install -r requirements.txt
 ```
 
-### Access Points
-- **Customer Portal**: http://localhost:3000
-- **Claims API**: http://localhost:8001/docs
-- **Admin Dashboard**: http://localhost:8080
+### 2. Set API Keys
 
-### Demo Credentials
-- Customer: demo@customer.com / demo123
-- Adjuster: demo@adjuster.com / demo123
-- Admin: admin@insureclaim.ai / admin123
+Create a `.env` file:
 
-## 🏗️ Technical Architecture
-
-### Microservices Architecture
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Web Portal    │────▶│   API Gateway   │────▶│  Load Balancer  │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                                  │
-        ┌─────────────────────────┼─────────────────────────┐
-        │                         │                         │
-  ┌─────▼──────┐          ┌──────▼──────┐          ┌──────▼──────┐
-  │Claims API  │          │Document API │          │  OCR API    │
-  └────────────┘          └─────────────┘          └─────────────┘
-        │                         │                         │
-  ┌─────▼──────────────────────────────────────────────────▼─────┐
-  │                     PostgreSQL Database                       │
-  └───────────────────────────────────────────────────────────────┘
+```env
+GROQ_API_KEY=your_groq_key_here
+# Optional:
+OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_key
+PINECONE_API_KEY=your_pinecone_key
 ```
 
-### Technology Stack
-- **Backend**: Python/FastAPI (high-performance async)
-- **AI/ML**: TensorFlow, PyTorch, Tesseract OCR
-- **Database**: PostgreSQL with Redis caching
-- **Storage**: MinIO (S3-compatible)
-- **Security**: Keycloak (OAuth2/OIDC)
-- **Infrastructure**: Docker, Kubernetes-ready
+### 3. Run Application
 
-## 📊 Business Model
+```bash
+# On Windows:
+py run.py
 
-### SaaS Pricing Tiers
+# On Linux/Mac:
+python run.py
+```
 
-| Tier | Monthly Price | Claims/Month | Features |
-|------|--------------|--------------|----------|
-| Starter | €999 | Up to 1,000 | Core features |
-| Professional | €2,999 | Up to 10,000 | + API access, priority support |
-| Enterprise | €9,999+ | Unlimited | + Custom ML models, dedicated support |
+### 4. Access
 
-### Revenue Projections
-- **Year 1**: €2.4M ARR (200 customers)
-- **Year 2**: €12M ARR (800 customers)
-- **Year 3**: €36M ARR (2,000 customers)
+- **API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **Frontend**: Open `frontend/index.html` in browser
 
-## 🎯 Go-to-Market Strategy
+> **Note**: The backend runs on port 8000 and the frontend connects to it automatically.
 
-### Phase 1: German Market (6 months)
-- **Target**: Mid-size insurers (€50M-€500M premiums)
-- **Partners**: Hallesche, TK (already integrated)
-- **Channels**: Direct sales, insurance conferences
+## Project Structure
 
-### Phase 2: DACH Region (12 months)
-- **Expansion**: Austria, Switzerland
-- **Partners**: Regional insurance associations
-- **White-label**: Platform-as-a-Service offering
+```
+insurance-claim-agent/
+├── backend/
+│   ├── api.py               # FastAPI application
+│   ├── config.py            # Configuration management
+│   ├── models.py            # Data models
+│   └── processors/          # Core business logic
+│       ├── document.py      # Document extraction
+│       ├── policy.py        # Policy indexing
+│       └── claim.py         # Claim analysis
+├── frontend/
+│   ├── index.html          # Web interface
+│   ├── app.js              # Frontend logic
+│   └── styles.css          # Styling
+├── data/
+│   └── samples/            # Sample documents
+├── .env                    # Environment variables
+├── requirements.txt        # Python dependencies
+└── run.py                  # Entry point
+```
 
-### Phase 3: European Market (24 months)
-- **Markets**: France, UK, Netherlands
-- **Strategy**: Strategic partnerships with InsurTech hubs
-- **Goal**: 10% market share in digital claims processing
+## API Endpoints
 
-## 👥 Current Customers & Pipeline
+### Health Check
+- `GET /health` - System status
 
-### Live Implementations
-- **Hallesche Insurance**: 50,000 claims/year
-- **TK (Techniker Krankenkasse)**: POC phase
+### Policy Management
+- `POST /api/policies/index` - Index policy document
+- `GET /api/policies/{id}/search` - Search policy
 
-### Pipeline (€5M+ ARR)
-- 3 enterprise insurers in negotiation
-- 12 mid-market insurers in demo phase
-- 2 reinsurance companies interested
+### Document Processing
+- `POST /api/documents/extract` - Extract claim data
 
-## 🚀 Competitive Advantages
+### Claim Analysis
+- `POST /api/claims/analyze/{id}` - Analyze claim
 
-### Why We Win
-1. **85% faster** than Guidewire ClaimCenter
-2. **60% cheaper** than custom implementations
-3. **German-optimized** OCR and compliance
-4. **Ready-to-deploy** vs 12-18 month implementations
-5. **AI-native** architecture vs legacy retrofits
+## Clean Code Principles
 
-### Competitive Landscape
-- **Guidewire**: Legacy, expensive, slow implementation
-- **Duck Creek**: US-focused, limited AI capabilities
-- **Shift Technology**: Fraud-only focus
-- **Us**: Full-stack, AI-native, local compliance
+This project follows:
+- **Single Responsibility** - Each module has one clear purpose
+- **DRY** - No code duplication
+- **Clear Naming** - Self-documenting code
+- **Minimal Dependencies** - Only essential packages
+- **Simple Structure** - Maximum 3 levels deep
 
-## 📈 Investment Opportunity
+## Requirements
 
-### Funding Round: Series A - €10M
+- Python 3.8+
+- At least one AI API key (Groq/OpenAI/Gemini)
+- Optional: Tesseract OCR for document processing
+- Optional: Pinecone API key for policy indexing
 
-### Use of Funds
-- **40% R&D**: ML models, new features
-- **30% Sales & Marketing**: European expansion
-- **20% Operations**: Infrastructure, support
-- **10% Regulatory**: Compliance, certifications
+## Troubleshooting
 
-### Expected Returns
-- **5x revenue growth** in 24 months
-- **Path to profitability** in 18 months
-- **Exit opportunity**: €500M+ valuation in 3-5 years
+### Frontend shows "404 Not Found"
+- Ensure the backend is running: `py run.py`
+- Check the API is accessible: http://localhost:8000/health
+- Verify frontend is using port 8000 (check browser console)
 
-## 🛡️ Security & Compliance
+### "€0.00 claimed, €0.00 approved"
+- This usually indicates the AI extraction format doesn't match expectations
+- The system automatically normalizes Groq response keys (Title Case → snake_case)
+- Check backend logs for extraction details
 
-- **GDPR Compliant**: Full data privacy controls
-- **BaFin Ready**: German insurance regulations
-- **ISO 27001**: Information security certified
-- **SOC 2 Type II**: Security audit passed
-- **End-to-end Encryption**: AES-256 encryption
+### Port Already in Use
+- Stop any existing instances: `Ctrl+C` in the terminal
+- Or change the port in `backend/config.py` (default: 8000)
 
-## 📞 Contact & Next Steps
+### AI Service Not Responding
+- Verify your API key is set in `.env`
+- Check you have internet connectivity
+- Groq/OpenAI/Gemini may have rate limits - wait a moment and retry
 
-**Ready to revolutionize your claims processing?**
+## Known Issues
 
-- **Schedule Demo**: [calendly.com/insureclaim-demo](https://calendly.com/insureclaim-demo)
-- **Email**: invest@insureclaim.ai
-- **Phone**: +49 30 12345678
+- **Groq Response Format**: Groq sometimes returns inconsistent JSON key formats (Title Case vs snake_case). The system handles this automatically via key normalization.
+- **OCR Dependencies**: Tesseract must be installed separately for image-based PDFs
 
-### Investor Resources
-- 📊 [Pitch Deck](https://drive.google.com/insureclaim-deck)
-- 📈 [Financial Model](https://drive.google.com/insureclaim-financials)
-- 📄 [Technical Documentation](./docs/technical-overview.pdf)
-- 🎥 [Product Demo Video](https://vimeo.com/insureclaim-demo)
+## License
 
----
-
-<p align="center">
-  <strong>InsureClaim AI - Where Insurance Meets Intelligence</strong><br>
-  <em>Backed by industry leaders | Built by insurance experts | Powered by AI</em>
-</p>
+MIT
