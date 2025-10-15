@@ -2,10 +2,6 @@
 const API_BASE_URL = 'http://localhost:8000';
 
 // App State
-let claimsCounter = 247;
-let approvedCounter = 198;
-let pendingCounter = 32;
-let rejectedCounter = 17;
 let policies = []; // Store loaded policies
 
 // Smooth scroll function
@@ -330,12 +326,6 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
         showRealResults(analysisData, processingTime, extractedData, claimId);
         
-        // Update counters
-        claimsCounter++;
-        document.getElementById('totalClaims').textContent = claimsCounter;
-        approvedCounter++;
-        document.getElementById('approved').textContent = approvedCounter;
-        
     } catch (error) {
         console.error('Error processing claim:', error);
         
@@ -432,118 +422,11 @@ document.getElementById('document').addEventListener('change', function(e) {
     document.querySelector('.file-upload span').textContent = fileName;
 });
 
-// Initialize Chart.js
-let chart;
-
-function initChart() {
-    const ctx = document.getElementById('metricsChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM'],
-            datasets: [{
-                label: 'Claims Processed',
-                data: [12, 19, 23, 35, 42, 38, 45],
-                borderColor: '#4F46E5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                tension: 0.4
-            }, {
-                label: 'Avg Processing Time (s)',
-                data: [32, 28, 25, 27, 24, 29, 28],
-                borderColor: '#10B981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
-function updateChart() {
-    if (chart) {
-        // Add new data point
-        const newValue = Math.floor(Math.random() * 10) + 40;
-        chart.data.datasets[0].data.push(newValue);
-        chart.data.datasets[0].data.shift();
-        
-        const newTime = Math.floor(Math.random() * 10) + 25;
-        chart.data.datasets[1].data.push(newTime);
-        chart.data.datasets[1].data.shift();
-        
-        chart.update();
-    }
-}
-
-// Initialize chart when page loads
+// Initialize on page load
 window.addEventListener('DOMContentLoaded', function() {
     // Load policies on page load
     loadPolicies();
-    
-    // Initialize chart if Chart.js is loaded
-    if (typeof Chart !== 'undefined') {
-        initChart();
-    }
-    
-    // Simulate live updates
-    setInterval(() => {
-        // Random claim updates
-        if (Math.random() > 0.7) {
-            claimsCounter++;
-            document.getElementById('totalClaims').textContent = claimsCounter;
-            
-            const rand = Math.random();
-            if (rand < 0.7) {
-                approvedCounter++;
-                document.getElementById('approved').textContent = approvedCounter;
-            } else if (rand < 0.9) {
-                pendingCounter++;
-                document.getElementById('pending').textContent = pendingCounter;
-            } else {
-                rejectedCounter++;
-                document.getElementById('rejected').textContent = rejectedCounter;
-            }
-        }
-        
-        // Update chart
-        updateChart();
-    }, 5000);
-    
-    // Check system health
-    checkSystemHealth();
-    setInterval(checkSystemHealth, 30000);
 });
-
-// System health check - now checks REAL API
-async function checkSystemHealth() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
-        if (response.ok) {
-            console.log('✅ AI Service is healthy');
-            const healthItems = document.querySelectorAll('.health-status');
-            healthItems.forEach((item, index) => {
-                item.textContent = index === 0 ? 'Healthy' : 
-                                   index === 1 ? 'Connected' :
-                                   index === 2 ? 'Running' : 'Active';
-                item.style.color = '#10B981';
-            });
-        }
-    } catch (error) {
-        console.warn('⚠️  AI Service not responding - is it running on port 8000?');
-    }
-}
 
 // Intersection Observer for animations
 const observerOptions = {
