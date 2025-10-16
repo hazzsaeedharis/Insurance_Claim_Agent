@@ -2,10 +2,7 @@
 const API_BASE_URL = 'http://localhost:8000';
 
 // App State
-let claimsCounter = 247;
-let approvedCounter = 198;
-let pendingCounter = 32;
-let rejectedCounter = 17;
+let policies = []; // Store loaded policies
 
 // Smooth scroll function
 function scrollToSection(sectionId) {
@@ -40,6 +37,459 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     alert('Login functionality would connect to Keycloak JWT authentication');
     closeLogin();
 });
+
+// ============================================================================
+// POLICY MANAGEMENT FUNCTIONS
+// ============================================================================
+
+// State for file management
+let selectedFiles = [];
+
+// Load policies from API
+async function loadPolicies() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/policies`);
+        if (!response.ok) {
+            throw new Error('Failed to load policies');
+        }
+        
+        const data = await response.json();
+        policies = data.policies || [];
+        
+        // Update dropdown in claim form
+        updatePolicyDropdown();
+        
+        // Update policies list
+        updatePoliciesList();
+        
+        return policies;
+    } catch (error) {
+        console.error('Error loading policies:', error);
+        return [];
+    }
+}
+
+// Update policy selector dropdown
+function updatePolicyDropdown() {
+    const policySelect = document.getElementById('policySelect');
+    
+    if (!policySelect) return;
+    
+    policySelect.innerHTML = '';
+    
+    if (policies.length === 0) {
+        policySelect.innerHTML = '<option value="">No policies available - Please upload a policy first</option>';
+        return;
+    }
+    
+    // Add default option
+    policySelect.innerHTML = '<option value="">-- Select a policy --</option>';
+    
+    // Add policy options
+    policies.forEach(policy => {
+        const option = document.createElement('option');
+        option.value = policy.policy_id;
+        option.textContent = `${policy.policy_name} (${policy.policy_id})`;
+        policySelect.appendChild(option);
+    });
+    
+    // Auto-select first policy if available
+    if (policies.length > 0) {
+        policySelect.value = policies[0].policy_id;
+    }
+}
+
+// Update policies list display
+function updatePoliciesList() {
+    const policiesList = document.getElementById('policiesList');
+    
+    if (!policiesList) return;
+    
+    if (policies.length === 0) {
+        policiesList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-folder-open" style="font-size: 48px; color: #9ca3af; margin-bottom: 10px;"></i>
+                <p style="color: #6b7280;">No policies indexed yet</p>
+                <small style="color: #9ca3af;">Upload a policy document to get started</small>
+            </div>
+        `;
+        return;
+    }
+    
+    policiesList.innerHTML = policies.map(policy => `
+        <div class="policy-item" id="policy-${policy.policy_id}">
+            <div class="policy-info">
+                <h4 class="policy-name" id="name-${policy.policy_id}">${policy.policy_name}</h4>
+                <span class="policy-id">${policy.policy_id}</span>
+            </div>
+            <div class="policy-actions">
+                <button class="btn btn-secondary btn-sm" onclick="renamePolicy('${policy.policy_id}')" title="Rename policy">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deletePolicy('${policy.policy_id}')" title="Delete policy">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================================================
+// FILE MANAGEMENT FUNCTIONS
+// ============================================================================
+
+// Handle file selection
+function handleFileSelection(e) {
+    const files = Array.from(e.target.files);
+    
+    // Append new files to existing selection
+    selectedFiles = [...selectedFiles, ...files];
+    
+    // Render the files list
+    renderFilesList();
+    
+    // Enable submit button
+    updateSubmitButton();
+    
+    // Reset file input
+    e.target.value = '';
+}
+
+// Render files list
+function renderFilesList() {
+    const container = document.getElementById('selectedFilesList');
+    const filesContainer = document.getElementById('filesContainer');
+    
+    if (selectedFiles.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    
+    filesContainer.innerHTML = selectedFiles.map((file, index) => `
+        <div class="file-item">
+            <div class="file-info">
+                <i class="fas fa-file-pdf file-icon"></i>
+                <div class="file-details">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                </div>
+            </div>
+            <button type="button" class="file-remove" onclick="removeFile(${index})">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Remove a specific file
+function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    renderFilesList();
+    updateSubmitButton();
+}
+
+// Clear all files
+function clearAllFiles() {
+    selectedFiles = [];
+    renderFilesList();
+    updateSubmitButton();
+}
+
+// Add more files
+function addMoreFiles() {
+    document.getElementById('policyFile').click();
+}
+
+// Update submit button state
+function updateSubmitButton() {
+    const btn = document.getElementById('submitPolicyBtn');
+    btn.disabled = selectedFiles.length === 0;
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// ============================================================================
+// POLICY UPLOAD WITH ANIMATION
+// ============================================================================
+
+// Animate policy processing step
+async function animatePolicyStep(stepNumber, duration = 1500) {
+    const step = document.getElementById(`policy-step-${stepNumber}`);
+    if (!step) return;
+    
+    // Mark as active
+    step.classList.add('active');
+    
+    // Wait
+    await new Promise(resolve => setTimeout(resolve, duration));
+    
+    // Mark as completed
+    step.classList.remove('active');
+    step.classList.add('completed');
+}
+
+// Show processing pipeline
+function showProcessingPipeline() {
+    const pipeline = document.getElementById('policyProcessingPipeline');
+    pipeline.style.display = 'block';
+    
+    // Reset all steps
+    document.querySelectorAll('.processing-pipeline .pipeline-step').forEach(step => {
+        step.classList.remove('active', 'completed');
+    });
+}
+
+// Hide processing pipeline
+function hideProcessingPipeline() {
+    const pipeline = document.getElementById('policyProcessingPipeline');
+    setTimeout(() => {
+        pipeline.style.display = 'none';
+    }, 2000);
+}
+
+// Policy upload form submission
+if (document.getElementById('policyUploadForm')) {
+    document.getElementById('policyUploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (selectedFiles.length === 0) {
+            alert('Please select at least one PDF file');
+            return;
+        }
+        
+        const policyId = document.getElementById('policyId').value.trim();
+        const policyName = document.getElementById('policyName').value.trim();
+        const statusDiv = document.getElementById('policyUploadStatus');
+        
+        try {
+            // Show processing pipeline
+            showProcessingPipeline();
+            statusDiv.style.display = 'none';
+            
+            // Step 1: Uploading files
+            await animatePolicyStep(1, 1000);
+            
+            const formData = new FormData();
+            
+            // Add optional fields
+            if (policyId) formData.append('policy_id', policyId);
+            if (policyName) formData.append('policy_name', policyName);
+            
+            // Add all selected files
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+            
+            // Upload to server
+            const uploadPromise = fetch(`${API_BASE_URL}/api/policies/index`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            // Step 2: Extracting text (while uploading)
+            await animatePolicyStep(2, 2000);
+            
+            // Wait for upload to complete
+            const response = await uploadPromise;
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || 'Upload failed');
+            }
+            
+            const result = await response.json();
+            
+            // Step 3: Chunking
+            await animatePolicyStep(3, 1500);
+            
+            // Step 4: Generating embeddings
+            await animatePolicyStep(4, 1500);
+            
+            // Step 5: Storing in Pinecone
+            await animatePolicyStep(5, 1000);
+            
+            // Show success
+            statusDiv.style.display = 'block';
+            statusDiv.style.color = '#10b981';
+            statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${result.message}`;
+            
+            // Reset form
+            selectedFiles = [];
+            renderFilesList();
+            updateSubmitButton();
+            e.target.reset();
+            
+            // Reload policies
+            await loadPolicies();
+            
+            // Hide pipeline and status after delay
+            hideProcessingPipeline();
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+            
+        } catch (error) {
+            console.error('Error uploading policy:', error);
+            
+            // Hide pipeline
+            document.getElementById('policyProcessingPipeline').style.display = 'none';
+            
+            // Show error
+            statusDiv.style.display = 'block';
+            statusDiv.style.color = '#ef4444';
+            statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`;
+        }
+    });
+    
+    // File input label update
+    document.getElementById('policyFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || 'Choose PDF file';
+        document.querySelector('#policyFile + label span').textContent = fileName;
+    });
+}
+
+// Rename policy
+async function renamePolicy(policyId) {
+    // Find current policy name
+    const policy = policies.find(p => p.policy_id === policyId);
+    if (!policy) return;
+    
+    const newName = prompt(`Rename policy:\n\nCurrent name: ${policy.policy_name}\n\nEnter new name:`, policy.policy_name);
+    
+    if (!newName || newName.trim() === '' || newName === policy.policy_name) {
+        return; // Cancelled or no change
+    }
+    
+    try {
+        // Update policy name via API
+        const response = await fetch(`${API_BASE_URL}/api/policies/${policyId}/rename`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ policy_name: newName.trim() })
+        });
+        
+        if (!response.ok) {
+            // If endpoint doesn't exist, update locally only
+            console.warn('Rename endpoint not available, updating locally');
+        }
+        
+        // Update local state immediately (real-time update)
+        policy.policy_name = newName.trim();
+        
+        // Update UI immediately without reload
+        const nameElement = document.getElementById(`name-${policyId}`);
+        if (nameElement) {
+            nameElement.textContent = newName.trim();
+        }
+        
+        // Update dropdown
+        updatePolicyDropdown();
+        
+        // Show success feedback
+        const policyElement = document.getElementById(`policy-${policyId}`);
+        if (policyElement) {
+            policyElement.style.backgroundColor = '#d1fae5';
+            setTimeout(() => {
+                policyElement.style.backgroundColor = '';
+            }, 1000);
+        }
+        
+    } catch (error) {
+        console.error('Error renaming policy:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+// Delete policy with real-time UI update
+async function deletePolicy(policyId) {
+    const policy = policies.find(p => p.policy_id === policyId);
+    const policyName = policy ? policy.policy_name : policyId;
+    
+    if (!confirm(`Are you sure you want to delete policy "${policyName}"?\n\nThis will remove all indexed data for this policy.`)) {
+        return;
+    }
+    
+    // Show deleting animation immediately
+    const policyElement = document.getElementById(`policy-${policyId}`);
+    if (policyElement) {
+        policyElement.style.opacity = '0.5';
+        policyElement.style.pointerEvents = 'none';
+        const deleteBtn = policyElement.querySelector('.btn-danger');
+        if (deleteBtn) {
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+            deleteBtn.disabled = true;
+        }
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/policies/${policyId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+            throw new Error(errorData.detail || 'Delete failed');
+        }
+        
+        const result = await response.json();
+        
+        // Remove from local state immediately
+        policies = policies.filter(p => p.policy_id !== policyId);
+        
+        // Animate removal from DOM
+        if (policyElement) {
+            policyElement.style.transform = 'translateX(-100%)';
+            policyElement.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                policyElement.remove();
+                
+                // Show empty state if no policies left
+                if (policies.length === 0) {
+                    updatePoliciesList();
+                }
+            }, 300);
+        }
+        
+        // Update dropdown immediately
+        updatePolicyDropdown();
+        
+        // Show success message briefly
+        const successMsg = document.createElement('div');
+        successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 9999;';
+        successMsg.innerHTML = `<i class="fas fa-check-circle"></i> Policy deleted (${result.vectors_deleted} vectors removed)`;
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+            successMsg.remove();
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Error deleting policy:', error);
+        
+        // Restore UI on error
+        if (policyElement) {
+            policyElement.style.opacity = '';
+            policyElement.style.pointerEvents = '';
+            const deleteBtn = policyElement.querySelector('.btn-danger');
+            if (deleteBtn) {
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.disabled = false;
+            }
+        }
+        
+        alert(`Error: ${error.message}`);
+    }
+}
 
 // UPDATED: Claim form submission with REAL API
 document.getElementById('claimForm').addEventListener('submit', async function(e) {
@@ -106,13 +556,19 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         step3.querySelector('p').textContent = 'Matching against policy...';
         await animateStep(3);
         
+        // Get selected policy
+        const selectedPolicy = document.getElementById('policySelect').value;
+        if (!selectedPolicy) {
+            throw new Error('Please select a policy first');
+        }
+        
         const analysisResponse = await fetch(`${API_BASE_URL}/api/claims/analyze/${claimId}`, { // Use the same claim ID
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                policy_id: 'HALLESCHE_NK_SELECT_S',
+                policy_id: selectedPolicy,
                 customer_id: 'DEMO-CUSTOMER'
             })
         });
@@ -125,25 +581,14 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         const analysisData = await analysisResponse.json();
         step3.querySelector('p').textContent = `Calculated ${analysisData.approval_rate.toFixed(1)}% coverage`;
         
-        // Step 4: Fraud Check (simulated)
+        // Step 4: Settlement
         const step4 = document.getElementById('step-4');
-        step4.querySelector('p').textContent = 'No fraud detected';
+        step4.querySelector('p').textContent = `Approved: €${analysisData.total_approved.toFixed(2)}`;
         await animateStep(4);
-        
-        // Step 5: Settlement
-        const step5 = document.getElementById('step-5');
-        step5.querySelector('p').textContent = `Approved: €${analysisData.total_approved.toFixed(2)}`;
-        await animateStep(5);
         
         // Show results with REAL data
         const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
         showRealResults(analysisData, processingTime, extractedData, claimId);
-        
-        // Update counters
-        claimsCounter++;
-        document.getElementById('totalClaims').textContent = claimsCounter;
-        approvedCounter++;
-        document.getElementById('approved').textContent = approvedCounter;
         
     } catch (error) {
         console.error('Error processing claim:', error);
@@ -235,121 +680,58 @@ function showRealResults(analysisData, processingTime, extractedData, claimId) {
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// File upload handling
+// ============================================================================
+// EVENT LISTENERS
+// ============================================================================
+
+// File selection handler
+if (document.getElementById('policyFile')) {
+    document.getElementById('policyFile').addEventListener('change', handleFileSelection);
+}
+
+// Clear all files button
+if (document.getElementById('clearFiles')) {
+    document.getElementById('clearFiles').addEventListener('click', clearAllFiles);
+}
+
+// Add more files button
+if (document.getElementById('addMoreFiles')) {
+    document.getElementById('addMoreFiles').addEventListener('click', addMoreFiles);
+}
+
+// Claim document file upload handling
+if (document.getElementById('document')) {
+    document.getElementById('document').addEventListener('change', function(e) {
+        const files = e.target.files;
+        const label = document.querySelector('#document + label span');
+        
+        if (files && files.length > 0) {
+            if (files.length === 1) {
+                label.textContent = files[0].name;
+                countDiv.style.display = 'none';
+            } else {
+                label.textContent = `${files.length} files selected`;
+                countDiv.style.display = 'block';
+                countDiv.textContent = `Files: ${Array.from(files).map(f => f.name).join(', ')}`;
+            }
+        } else {
+            label.textContent = 'Choose PDF file(s)';
+            countDiv.style.display = 'none';
+        }
+    });
+}
+
+// Claim document file upload handling
 document.getElementById('document').addEventListener('change', function(e) {
     const fileName = e.target.files[0]?.name || 'Choose file or drag here';
     document.querySelector('.file-upload span').textContent = fileName;
 });
 
-// Initialize Chart.js
-let chart;
-
-function initChart() {
-    const ctx = document.getElementById('metricsChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM'],
-            datasets: [{
-                label: 'Claims Processed',
-                data: [12, 19, 23, 35, 42, 38, 45],
-                borderColor: '#4F46E5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                tension: 0.4
-            }, {
-                label: 'Avg Processing Time (s)',
-                data: [32, 28, 25, 27, 24, 29, 28],
-                borderColor: '#10B981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
-function updateChart() {
-    if (chart) {
-        // Add new data point
-        const newValue = Math.floor(Math.random() * 10) + 40;
-        chart.data.datasets[0].data.push(newValue);
-        chart.data.datasets[0].data.shift();
-        
-        const newTime = Math.floor(Math.random() * 10) + 25;
-        chart.data.datasets[1].data.push(newTime);
-        chart.data.datasets[1].data.shift();
-        
-        chart.update();
-    }
-}
-
-// Initialize chart when page loads
+// Initialize on page load
 window.addEventListener('DOMContentLoaded', function() {
-    // Initialize chart if Chart.js is loaded
-    if (typeof Chart !== 'undefined') {
-        initChart();
-    }
-    
-    // Simulate live updates
-    setInterval(() => {
-        // Random claim updates
-        if (Math.random() > 0.7) {
-            claimsCounter++;
-            document.getElementById('totalClaims').textContent = claimsCounter;
-            
-            const rand = Math.random();
-            if (rand < 0.7) {
-                approvedCounter++;
-                document.getElementById('approved').textContent = approvedCounter;
-            } else if (rand < 0.9) {
-                pendingCounter++;
-                document.getElementById('pending').textContent = pendingCounter;
-            } else {
-                rejectedCounter++;
-                document.getElementById('rejected').textContent = rejectedCounter;
-            }
-        }
-        
-        // Update chart
-        updateChart();
-    }, 5000);
-    
-    // Check system health
-    checkSystemHealth();
-    setInterval(checkSystemHealth, 30000);
+    // Load policies on page load
+    loadPolicies();
 });
-
-// System health check - now checks REAL API
-async function checkSystemHealth() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
-        if (response.ok) {
-            console.log('✅ AI Service is healthy');
-            const healthItems = document.querySelectorAll('.health-status');
-            healthItems.forEach((item, index) => {
-                item.textContent = index === 0 ? 'Healthy' : 
-                                   index === 1 ? 'Connected' :
-                                   index === 2 ? 'Running' : 'Active';
-                item.style.color = '#10B981';
-            });
-        }
-    } catch (error) {
-        console.warn('⚠️  AI Service not responding - is it running on port 8000?');
-    }
-}
 
 // Intersection Observer for animations
 const observerOptions = {

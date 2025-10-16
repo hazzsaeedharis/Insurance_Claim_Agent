@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Helper</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f0f0f0; }
+        .test-policy { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            margin: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+        .policy-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .policy-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+        .policy-id {
+            font-size: 0.875rem;
+            color: #666;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        .policy-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <h1>Debug Helper - Testing Rename Button</h1>
+    
+    <div class="test-policy">
+        <h2>This is what each policy should look like:</h2>
+        
+        <div class="policy-item" id="policy-TEST">
+            <div class="policy-info">
+                <h4 class="policy-name">Dental Perplexity (2 documents)</h4>
+                <span class="policy-id">DENTAL_PERPLEXITY_2_DOCUMENTS_2025</span>
+            </div>
+            <div class="policy-actions">
+                <button class="btn btn-secondary btn-sm" onclick="alert('Rename button clicked!')" title="Rename policy">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="alert('Delete button clicked!')" title="Delete policy">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-policy">
+        <h2>Debug Steps:</h2>
+        <ol>
+            <li>Open your main app (frontend/index.html)</li>
+            <li>Press F12 to open Developer Console</li>
+            <li>In the Console, type: <code>console.log(policies)</code></li>
+            <li>Check if you see your policies array</li>
+            <li>Type: <code>updatePoliciesList()</code> to force refresh the list</li>
+            <li>If still no edit button, type: <code>location.reload(true)</code> for hard refresh</li>
+        </ol>
+    </div>
+    
+    <div class="test-policy">
+        <h2>Quick Fix Commands (paste in Console):</h2>
+        <pre>
+// Force refresh policies list
+loadPolicies().then(() => console.log('Policies reloaded'));
+
+// Check if rename function exists
+console.log('renamePolicy exists:', typeof renamePolicy);
+
+// Manually test the HTML generation
+console.log(policies.map(p => p.policy_name));
+        </pre>
+    </div>
+    
+    <script>
+        console.log('Debug helper loaded. Both Edit and Delete buttons should be visible above.');
+    </script>
+</body>
+</html>
