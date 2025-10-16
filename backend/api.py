@@ -8,7 +8,7 @@ All endpoints are organized logically with clear separation of concerns.
 import os
 import tempfile
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pathlib import Path
 
@@ -132,59 +132,116 @@ async def get_status():
 
 @app.post("/api/policies/index", response_model=PolicyIndexResponse)
 async def index_policy(
-    policy_id: str = Form(...),
-    policy_name: str = Form(...),
-    file: UploadFile = File(...)
+    policy_id: Optional[str] = Form(None),
+    policy_name: Optional[str] = Form(None),
+    files: List[UploadFile] = File(...)
 ):
     """
-    Index a new insurance policy document for RAG retrieval.
+    Index insurance policy documents (supports multiple files).
+    
+    Features:
+    - Auto-generates policy_name from first file if not provided
+    - Auto-generates policy_id from policy_name if not provided
+    - Supports batch upload of multiple PDFs per policy
     
     Args:
-        policy_id: Unique identifier for the policy
-        policy_name: Human-readable policy name
-        file: PDF file containing policy terms
-        
-    Returns:
-        PolicyIndexResponse: Result of indexing operation
-        
-    This endpoint processes policy PDFs and stores them in a vector database
-    for later retrieval during claim analysis.
-    """
-    logger.info(f"Indexing policy {policy_id}: {policy_name}")
+        policy_id: Optional unique identifier (auto-generated if not provided)
+        policy_name: Optional human-readable name (extracted from filename if not provided)
+        files: One or more PDF files containing policy terms
     
-    try:
-        # Validate file type
+    Returns:
+        PolicyIndexResponse with indexing results
+    """
+    import re
+    
+    # Validate at least one file
+    if not files:
+        raise HTTPException(status_code=400, detail="At least one PDF file is required")
+    
+    # Validate all files are PDFs
+    for file in files:
         if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(
                 status_code=400,
-                detail="Only PDF files are supported for policy documents"
+                detail=f"Only PDF files are supported. '{file.filename}' is not a PDF."
             )
+    
+    # Auto-generate policy_name if not provided
+    if not policy_name:
+        if len(files) == 1:
+            # Single file: use its name
+            first_filename = files[0].filename
+            policy_name = first_filename.replace('.pdf', '').replace('_', ' ')
+            policy_name = ' '.join(word.capitalize() for word in policy_name.split())
+        else:
+            # Multiple files: create combined name
+            # Extract base name from first file
+            first_filename = files[0].filename.replace('.pdf', '').replace('_', ' ')
+            first_name = ' '.join(word.capitalize() for word in first_filename.split())
+            # Add count
+            policy_name = f"{first_name} ({len(files)} documents)"
+        logger.info(f"Auto-generated policy name: {policy_name}")
+    
+    # Auto-generate policy_id if not provided
+    if not policy_id:
+        # Generate from policy_name
+        # Replace non-alphanumeric with underscore, convert to uppercase
+        policy_id = re.sub(r'[^A-Za-z0-9]+', '_', policy_name.upper())
+        # Remove leading/trailing underscores
+        policy_id = policy_id.strip('_')
+        # Add year to make it unique
+        policy_id = f"{policy_id}_{datetime.now().year}"
+        logger.info(f"Auto-generated policy ID: {policy_id}")
+    
+    logger.info(f"Indexing policy {policy_id}: {policy_name} with {len(files)} file(s)")
+    
+    try:
+        total_chunks = 0
+        temp_files = []
         
-        # Save uploaded file temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            content = await file.read()
-            tmp_file.write(content)
-            tmp_path = tmp_file.name
+        # Save all files temporarily with streaming to avoid memory issues
+        for i, file in enumerate(files):
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                # Stream file content in chunks to avoid loading entire file in memory
+                while chunk := await file.read(1024 * 1024):  # 1MB chunks
+                    tmp_file.write(chunk)
+                temp_files.append(tmp_file.name)
+                logger.info(f"Saved file {i+1}/{len(files)}: {file.filename}")
         
         try:
-            # Index the policy document
-            result = policy_indexer.index_policy_document(
-                pdf_path=tmp_path,
-                policy_id=policy_id,
-                policy_name=policy_name
-            )
+            # Index each file
+            for i, tmp_path in enumerate(temp_files):
+                logger.info(f"Indexing file {i+1}/{len(files)} for policy {policy_id}")
+                
+                result = policy_indexer.index_policy_document(
+                    pdf_path=tmp_path,
+                    policy_id=policy_id,
+                    policy_name=policy_name
+                )
+                
+                total_chunks += result.get('total_chunks', 0)
+            
+            message = f"Successfully indexed {len(files)} file(s) with {total_chunks} total chunks"
             
             return PolicyIndexResponse(
                 success=True,
                 policy_id=policy_id,
-                message=f"Successfully indexed policy with {result['total_chunks']} chunks",
-                details=result
+                message=message,
+                details={
+                    "policy_name": policy_name,
+                    "files_processed": len(files),
+                    "total_chunks": total_chunks
+                }
             )
             
         finally:
-            # Clean up temporary file
-            os.unlink(tmp_path)
-            
+            # Clean up temporary files
+            for tmp_path in temp_files:
+                try:
+                    os.unlink(tmp_path)
+                except Exception as e:
+                    logger.warning(f"Failed to delete temp file {tmp_path}: {e}")
+    
     except Exception as e:
         logger.error(f"Error indexing policy: {e}")
         raise HTTPException(status_code=500, detail=str(e))

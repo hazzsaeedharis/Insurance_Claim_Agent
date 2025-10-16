@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClaimAI Pro - Intelligent Insurance Claims Processing</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="policy-styles-addon.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -97,19 +98,6 @@
                 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-shield-virus"></i>
-                    </div>
-                    <h3>Fraud Detection</h3>
-                    <p>Real-time fraud scoring using machine learning algorithms</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-check"></i> Pattern recognition</li>
-                        <li><i class="fas fa-check"></i> Duplicate detection</li>
-                        <li><i class="fas fa-check"></i> Risk scoring</li>
-                    </ul>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
                         <i class="fas fa-balance-scale"></i>
                     </div>
                     <h3>Policy Validation</h3>
@@ -118,19 +106,6 @@
                         <li><i class="fas fa-check"></i> Real-time validation</li>
                         <li><i class="fas fa-check"></i> Coverage calculation</li>
                         <li><i class="fas fa-check"></i> Deductible handling</li>
-                    </ul>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>Instant Settlement</h3>
-                    <p>Calculate settlements in seconds with complete transparency</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-check"></i> Auto-calculation</li>
-                        <li><i class="fas fa-check"></i> SEPA integration</li>
-                        <li><i class="fas fa-check"></i> Audit trail</li>
                     </ul>
                 </div>
                 
@@ -146,18 +121,42 @@
                         <li><i class="fas fa-check"></i> Keycloak integration</li>
                     </ul>
                 </div>
+            </div>
+
+            <!-- Coming Soon Section -->
+            <div style="margin-top: 4rem;">
+                <h2 class="section-title" style="margin-bottom: 1rem;">
+                    <i class="fas fa-clock" style="color: #8b5cf6; font-size: 0.8em; margin-right: 0.5rem;"></i>
+                    Coming Soon
+                </h2>
+                <p class="section-subtitle">Exciting features in development</p>
                 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
+                <div class="features-grid" style="opacity: 0.85;">
+                    <div class="feature-card" style="border: 2px dashed #8b5cf6;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+                            <i class="fas fa-shield-virus"></i>
+                        </div>
+                        <h3>Fraud Detection <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span></h3>
+                        <p>Real-time fraud scoring using machine learning algorithms</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-hourglass-half"></i> Pattern recognition</li>
+                            <li><i class="fas fa-hourglass-half"></i> Duplicate detection</li>
+                            <li><i class="fas fa-hourglass-half"></i> Risk scoring</li>
+                        </ul>
                     </div>
-                    <h3>Analytics Dashboard</h3>
-                    <p>Real-time insights and comprehensive reporting</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-check"></i> Live metrics</li>
-                        <li><i class="fas fa-check"></i> Custom reports</li>
-                        <li><i class="fas fa-check"></i> Prometheus ready</li>
-                    </ul>
+                    
+                    <div class="feature-card" style="border: 2px dashed #8b5cf6;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Analytics Dashboard <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span></h3>
+                        <p>Real-time insights and comprehensive reporting</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-hourglass-half"></i> Live metrics</li>
+                            <li><i class="fas fa-hourglass-half"></i> Custom reports</li>
+                            <li><i class="fas fa-hourglass-half"></i> Prometheus ready</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -171,7 +170,7 @@
             
             <div class="demo-container">
                 <div class="demo-panel">
-                    <h3><i class="fas fa-upload"></i> Submit Claim</h3>
+                    <h3>Submit Claim</h3>
                     <form id="claimForm" class="claim-form">
                         <div class="form-group">
                             <label>Policy Number</label>
@@ -213,7 +212,7 @@
                         </div>
                         
                         <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-paper-plane"></i> Submit Claim
+                            <i class="fas fa-rocket"></i> Submit Claim
                         </button>
                     </form>
                 </div>
@@ -252,16 +251,6 @@
                         </div>
                         
                         <div class="pipeline-step" id="step-4">
-                            <div class="step-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="step-content">
-                                <h4>Fraud Check</h4>
-                                <p>Running fraud detection...</p>
-                            </div>
-                        </div>
-                        
-                        <div class="pipeline-step" id="step-5">
                             <div class="step-icon">
                                 <i class="fas fa-calculator"></i>
                             </div>
@@ -304,44 +293,98 @@
             <h2 class="section-title">Policy Management</h2>
             <p class="section-subtitle">Upload and manage insurance policy documents</p>
             
-            <div class="policies-container">
-                <!-- Upload Policy Card -->
-                <div class="policy-card">
-                    <h3><i class="fas fa-upload"></i> Upload Policy</h3>
+            <div class="policies-grid">
+                <!-- Upload Policy Card (Left Side) -->
+                <div class="policy-card upload-card">
+                    <h3><i class="fas fa-file-upload"></i> Upload Policy Documents</h3>
                     <form id="policyUploadForm" class="policy-form">
                         <div class="form-group">
-                            <label>Policy ID <span style="color: #ef4444;">*</span></label>
-                            <input type="text" id="policyId" placeholder="e.g., HALLESCHE_NK_SELECT_S" required>
-                            <small>Unique identifier for this policy</small>
+                            <label>Policy ID <small style="color: #9ca3af;">(Optional)</small></label>
+                            <input type="text" id="policyId" placeholder="Auto-generated if empty">
+                            <small>Leave empty to auto-generate from policy name</small>
                         </div>
                         
                         <div class="form-group">
-                            <label>Policy Name <span style="color: #ef4444;">*</span></label>
-                            <input type="text" id="policyName" placeholder="e.g., Hallesche NK.select S" required>
-                            <small>Human-readable policy name</small>
+                            <label>Policy Name <small style="color: #9ca3af;">(Optional)</small></label>
+                            <input type="text" id="policyName" placeholder="Auto-generated from filename if empty">
+                            <small>Leave empty to extract from PDF filename</small>
                         </div>
                         
                         <div class="form-group">
-                            <label>Policy Document (PDF) <span style="color: #ef4444;">*</span></label>
+                            <label>Select PDF Files <small style="color: #10b981;">(Multiple supported)</small></label>
                             <div class="file-upload">
-                                <input type="file" id="policyFile" accept=".pdf" required>
+                                <input type="file" id="policyFile" accept=".pdf" multiple>
                                 <label for="policyFile">
-                                    <i class="fas fa-file-pdf"></i>
-                                    <span>Choose PDF file</span>
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose PDF file(s)</span>
                                 </label>
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-cloud-upload-alt"></i> Upload & Index Policy
-                        </button>
+                        <!-- Selected Files List -->
+                        <div id="selectedFilesList" class="selected-files" style="display: none;">
+                            <div class="selected-files-header">
+                                <strong>Selected Files:</strong>
+                                <button type="button" id="clearFiles" class="btn-link">
+                                    <i class="fas fa-times"></i> Clear All
+                                </button>
+                            </div>
+                            <div id="filesContainer" class="files-container"></div>
+                            <button type="button" id="addMoreFiles" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-plus"></i> Add More Files
+                            </button>
+                        </div>
                         
-                        <div id="policyUploadStatus" class="upload-status" style="display: none; margin-top: 15px;"></div>
+                        <button type="submit" id="submitPolicyBtn" class="btn btn-primary btn-block" disabled>
+                            <i class="fas fa-rocket"></i> Upload & Index Policy
+                        </button>
                     </form>
+                    
+                    <!-- Processing Pipeline -->
+                    <div id="policyProcessingPipeline" class="processing-pipeline" style="display: none;">
+                        <h4><i class="fas fa-cogs"></i> Processing</h4>
+                        <div class="pipeline-step" id="policy-step-1">
+                            <div class="step-icon"><i class="fas fa-upload"></i></div>
+                            <div class="step-content">
+                                <h5>Uploading Files</h5>
+                                <p>Streaming PDFs to server...</p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="policy-step-2">
+                            <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="step-content">
+                                <h5>Extracting Text</h5>
+                                <p>Parsing PDF pages...</p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="policy-step-3">
+                            <div class="step-icon"><i class="fas fa-cut"></i></div>
+                            <div class="step-content">
+                                <h5>Chunking</h5>
+                                <p>Splitting into sections...</p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="policy-step-4">
+                            <div class="step-icon"><i class="fas fa-brain"></i></div>
+                            <div class="step-content">
+                                <h5>Generating Embeddings</h5>
+                                <p>Creating vector representations...</p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="policy-step-5">
+                            <div class="step-icon"><i class="fas fa-database"></i></div>
+                            <div class="step-content">
+                                <h5>Storing in Pinecone</h5>
+                                <p>Indexing vectors...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="policyUploadStatus" class="upload-status" style="display: none;"></div>
                 </div>
                 
-                <!-- Indexed Policies List -->
-                <div class="policy-card">
+                <!-- Indexed Policies List (Right Side) -->
+                <div class="policy-card indexed-card">
                     <h3><i class="fas fa-list"></i> Indexed Policies</h3>
                     <div id="policiesList" class="policies-list">
                         <div class="loading-spinner">
