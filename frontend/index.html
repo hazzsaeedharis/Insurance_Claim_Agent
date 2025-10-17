@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<!-- ============================================================================
+     HEAD: Metadata, Stylesheets, and External Resources
+     ============================================================================ -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClaimAI Pro - Intelligent Insurance Claims Processing</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="policy-styles-addon.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    <!-- Navigation -->
+    
+    <!-- ========================================================================
+         NAVIGATION BAR
+         ======================================================================== -->
     <nav class="navbar">
         <div class="nav-container">
+            <!-- Logo -->
             <div class="logo">
                 <i class="fas fa-shield-alt"></i>
                 <span>ClaimAI Pro</span>
             </div>
+            
+            <!-- Navigation Menu -->
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#features" class="nav-link">Features</a></li>
@@ -27,16 +40,22 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- ========================================================================
+         HERO SECTION
+         ======================================================================== -->
     <section id="home" class="hero">
+        <!-- Hero Content (Left Side) -->
         <div class="hero-content">
             <h1 class="hero-title">
                 <span class="gradient-text">AI-Powered</span><br>
                 Insurance Claims Processing
             </h1>
             <p class="hero-subtitle">
-                Process claims 10x faster with intelligent document extraction, automated fraud detection, and real-time settlement calculations.
+                Process claims 10x faster with intelligent document extraction, 
+                automated fraud detection, and real-time settlement calculations.
             </p>
+            
+            <!-- Call to Action Buttons -->
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="showDemo()">
                     <i class="fas fa-play"></i> Start Demo
@@ -45,6 +64,8 @@
                     <i class="fas fa-info-circle"></i> Learn More
                 </button>
             </div>
+            
+            <!-- Statistics -->
             <div class="hero-stats">
                 <div class="stat">
                     <h3>95%</h3>
@@ -60,6 +81,8 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Hero Image (Right Side) -->
         <div class="hero-image">
             <div class="floating-card card-1">
                 <i class="fas fa-file-medical"></i>
@@ -76,13 +99,17 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- ========================================================================
+         FEATURES SECTION
+         ======================================================================== -->
     <section id="features" class="features">
         <div class="container">
             <h2 class="section-title">Powerful Features</h2>
             <p class="section-subtitle">Everything you need for modern insurance claims processing</p>
             
+            <!-- Feature Cards Grid -->
             <div class="features-grid">
+                <!-- Feature: Intelligent OCR -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-robot"></i>
@@ -96,6 +123,7 @@
                     </ul>
                 </div>
                 
+                <!-- Feature: Policy Validation -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-balance-scale"></i>
@@ -109,6 +137,7 @@
                     </ul>
                 </div>
                 
+                <!-- Feature: Role-Based Access -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
@@ -123,7 +152,7 @@
                 </div>
             </div>
 
-            <!-- Coming Soon Section -->
+            <!-- Coming Soon Features -->
             <div style="margin-top: 4rem;">
                 <h2 class="section-title" style="margin-bottom: 1rem;">
                     <i class="fas fa-clock" style="color: #8b5cf6; font-size: 0.8em; margin-right: 0.5rem;"></i>
@@ -132,11 +161,15 @@
                 <p class="section-subtitle">Exciting features in development</p>
                 
                 <div class="features-grid" style="opacity: 0.85;">
+                    <!-- Coming Soon: Fraud Detection -->
                     <div class="feature-card" style="border: 2px dashed #8b5cf6;">
                         <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
                             <i class="fas fa-shield-virus"></i>
                         </div>
-                        <h3>Fraud Detection <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span></h3>
+                        <h3>
+                            Fraud Detection 
+                            <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span>
+                        </h3>
                         <p>Real-time fraud scoring using machine learning algorithms</p>
                         <ul class="feature-list">
                             <li><i class="fas fa-hourglass-half"></i> Pattern recognition</li>
@@ -145,11 +178,15 @@
                         </ul>
                     </div>
                     
+                    <!-- Coming Soon: Analytics Dashboard -->
                     <div class="feature-card" style="border: 2px dashed #8b5cf6;">
                         <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <h3>Analytics Dashboard <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span></h3>
+                        <h3>
+                            Analytics Dashboard 
+                            <span style="background: #8b5cf6; color: white; font-size: 0.6em; padding: 0.2em 0.5em; border-radius: 0.3em; margin-left: 0.5em;">SOON</span>
+                        </h3>
                         <p>Real-time insights and comprehensive reporting</p>
                         <ul class="feature-list">
                             <li><i class="fas fa-hourglass-half"></i> Live metrics</li>
@@ -162,21 +199,26 @@
         </div>
     </section>
 
-    <!-- Demo Section -->
+    <!-- ========================================================================
+         DEMO SECTION: Live Claim Submission
+         ======================================================================== -->
     <section id="demo" class="demo-section">
         <div class="container">
             <h2 class="section-title">Live Demo</h2>
             <p class="section-subtitle">Submit a claim and watch the AI process it in real-time</p>
             
             <div class="demo-container">
+                <!-- Left Panel: Claim Form -->
                 <div class="demo-panel">
                     <h3>Submit Claim</h3>
                     <form id="claimForm" class="claim-form">
+                        <!-- Policy Number -->
                         <div class="form-group">
                             <label>Policy Number</label>
                             <input type="text" id="policyNumber" value="HK-2024-001234" required>
                         </div>
                         
+                        <!-- Policy Selection -->
                         <div class="form-group">
                             <label>Select Policy <span style="color: #ef4444;">*</span></label>
                             <select id="policySelect" required>
@@ -185,6 +227,7 @@
                             <small style="color: #6b7280; font-size: 0.85em;">Choose which policy to analyze against</small>
                         </div>
                         
+                        <!-- Claim Type -->
                         <div class="form-group">
                             <label>Claim Type</label>
                             <select id="claimType" required>
@@ -195,11 +238,13 @@
                             </select>
                         </div>
                         
+                        <!-- Amount -->
                         <div class="form-group">
                             <label>Amount (EUR)</label>
-                            <input type="number" id="amount" value="250.00" step="0.01" required>
+                            <input type="number" id="amount" value="0.00" step="0.01" required>
                         </div>
                         
+                        <!-- Document Upload -->
                         <div class="form-group">
                             <label>Document Upload</label>
                             <div class="file-upload">
@@ -211,15 +256,20 @@
                             </div>
                         </div>
                         
+                        <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary btn-block">
                             <i class="fas fa-rocket"></i> Submit Claim
                         </button>
                     </form>
                 </div>
                 
+                <!-- Right Panel: Processing Pipeline & Results -->
                 <div class="demo-panel">
                     <h3><i class="fas fa-cogs"></i> Processing Pipeline</h3>
+                    
+                    <!-- Processing Steps -->
                     <div class="pipeline">
+                        <!-- Step 1: Document Received -->
                         <div class="pipeline-step" id="step-1">
                             <div class="step-icon">
                                 <i class="fas fa-upload"></i>
@@ -230,6 +280,7 @@
                             </div>
                         </div>
                         
+                        <!-- Step 2: OCR Processing -->
                         <div class="pipeline-step" id="step-2">
                             <div class="step-icon">
                                 <i class="fas fa-eye"></i>
@@ -240,6 +291,7 @@
                             </div>
                         </div>
                         
+                        <!-- Step 3: AI Analysis -->
                         <div class="pipeline-step" id="step-3">
                             <div class="step-icon">
                                 <i class="fas fa-brain"></i>
@@ -250,6 +302,7 @@
                             </div>
                         </div>
                         
+                        <!-- Step 4: Settlement -->
                         <div class="pipeline-step" id="step-4">
                             <div class="step-icon">
                                 <i class="fas fa-calculator"></i>
@@ -261,6 +314,7 @@
                         </div>
                     </div>
                     
+                    <!-- Results Panel -->
                     <div class="result-panel" id="resultPanel">
                         <h4><i class="fas fa-check-circle"></i> Claim Processed</h4>
                         <div class="result-details">
@@ -287,29 +341,35 @@
         </div>
     </section>
 
-    <!-- Policies Section -->
+    <!-- ========================================================================
+         POLICY MANAGEMENT SECTION
+         ======================================================================== -->
     <section id="policies" class="policies-section">
         <div class="container">
             <h2 class="section-title">Policy Management</h2>
             <p class="section-subtitle">Upload and manage insurance policy documents</p>
             
             <div class="policies-grid">
-                <!-- Upload Policy Card (Left Side) -->
+                <!-- Left Card: Upload Policy Documents -->
                 <div class="policy-card upload-card">
                     <h3><i class="fas fa-file-upload"></i> Upload Policy Documents</h3>
+                    
                     <form id="policyUploadForm" class="policy-form">
+                        <!-- Policy ID (Optional) -->
                         <div class="form-group">
                             <label>Policy ID <small style="color: #9ca3af;">(Optional)</small></label>
                             <input type="text" id="policyId" placeholder="Auto-generated if empty">
                             <small>Leave empty to auto-generate from policy name</small>
                         </div>
                         
+                        <!-- Policy Name (Optional) -->
                         <div class="form-group">
                             <label>Policy Name <small style="color: #9ca3af;">(Optional)</small></label>
                             <input type="text" id="policyName" placeholder="Auto-generated from filename if empty">
                             <small>Leave empty to extract from PDF filename</small>
                         </div>
                         
+                        <!-- File Upload (Multiple PDFs) -->
                         <div class="form-group">
                             <label>Select PDF Files <small style="color: #10b981;">(Multiple supported)</small></label>
                             <div class="file-upload">
@@ -335,6 +395,7 @@
                             </button>
                         </div>
                         
+                        <!-- Submit Button -->
                         <button type="submit" id="submitPolicyBtn" class="btn btn-primary btn-block" disabled>
                             <i class="fas fa-rocket"></i> Upload & Index Policy
                         </button>
@@ -343,6 +404,8 @@
                     <!-- Processing Pipeline -->
                     <div id="policyProcessingPipeline" class="processing-pipeline" style="display: none;">
                         <h4><i class="fas fa-cogs"></i> Processing</h4>
+                        
+                        <!-- Step 1: Uploading -->
                         <div class="pipeline-step" id="policy-step-1">
                             <div class="step-icon"><i class="fas fa-upload"></i></div>
                             <div class="step-content">
@@ -350,6 +413,8 @@
                                 <p>Streaming PDFs to server...</p>
                             </div>
                         </div>
+                        
+                        <!-- Step 2: Extracting Text -->
                         <div class="pipeline-step" id="policy-step-2">
                             <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
                             <div class="step-content">
@@ -357,6 +422,8 @@
                                 <p>Parsing PDF pages...</p>
                             </div>
                         </div>
+                        
+                        <!-- Step 3: Chunking -->
                         <div class="pipeline-step" id="policy-step-3">
                             <div class="step-icon"><i class="fas fa-cut"></i></div>
                             <div class="step-content">
@@ -364,6 +431,8 @@
                                 <p>Splitting into sections...</p>
                             </div>
                         </div>
+                        
+                        <!-- Step 4: Generating Embeddings -->
                         <div class="pipeline-step" id="policy-step-4">
                             <div class="step-icon"><i class="fas fa-brain"></i></div>
                             <div class="step-content">
@@ -371,6 +440,8 @@
                                 <p>Creating vector representations...</p>
                             </div>
                         </div>
+                        
+                        <!-- Step 5: Storing in Pinecone -->
                         <div class="pipeline-step" id="policy-step-5">
                             <div class="step-icon"><i class="fas fa-database"></i></div>
                             <div class="step-content">
@@ -380,10 +451,11 @@
                         </div>
                     </div>
                     
+                    <!-- Upload Status Message -->
                     <div id="policyUploadStatus" class="upload-status" style="display: none;"></div>
                 </div>
                 
-                <!-- Indexed Policies List (Right Side) -->
+                <!-- Right Card: Indexed Policies List -->
                 <div class="policy-card indexed-card">
                     <h3><i class="fas fa-list"></i> Indexed Policies</h3>
                     <div id="policiesList" class="policies-list">
@@ -396,20 +468,28 @@
         </div>
     </section>
 
-    <!-- Login Modal -->
+    <!-- ========================================================================
+         LOGIN MODAL
+         ======================================================================== -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeLogin()">&times;</span>
             <h2>Login</h2>
+            
             <form id="loginForm">
+                <!-- Email -->
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" placeholder="user@example.com" required>
                 </div>
+                
+                <!-- Password -->
                 <div class="form-group">
                     <label>Password</label>
                     <input type="password" placeholder="Password" required>
                 </div>
+                
+                <!-- Role -->
                 <div class="form-group">
                     <label>Role</label>
                     <select>
@@ -419,19 +499,26 @@
                         <option>Admin</option>
                     </select>
                 </div>
+                
+                <!-- Submit -->
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
             </form>
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- ========================================================================
+         FOOTER
+         ======================================================================== -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
+                <!-- About Section -->
                 <div class="footer-section">
                     <h3>ClaimAI Pro</h3>
                     <p>Next-generation insurance claims processing powered by artificial intelligence.</p>
                 </div>
+                
+                <!-- Technology Stack -->
                 <div class="footer-section">
                     <h4>Technology</h4>
                     <ul>
@@ -441,6 +528,8 @@
                         <li>Docker & Kubernetes</li>
                     </ul>
                 </div>
+                
+                <!-- Features List -->
                 <div class="footer-section">
                     <h4>Features</h4>
                     <ul>
@@ -450,6 +539,8 @@
                         <li>Real-time Analytics</li>
                     </ul>
                 </div>
+                
+                <!-- Social Links -->
                 <div class="footer-section">
                     <h4>Connect</h4>
                     <div class="social-links">
@@ -459,12 +550,17 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Copyright -->
             <div class="footer-bottom">
-                <p>&copy; 2024 ClaimAI Pro. Built with ❤️ for Hallesche Insurance</p>
+                <p>&copy; 2025 ClaimAI Pro. Built with ❤️ by HSH</p>
             </div>
         </div>
     </footer>
 
+    <!-- ========================================================================
+         JAVASCRIPT
+         ======================================================================== -->
     <script src="app.js"></script>
 </body>
 </html>
