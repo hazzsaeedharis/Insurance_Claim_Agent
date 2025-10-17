@@ -48,13 +48,19 @@ let selectedFiles = [];
 // Load policies from API
 async function loadPolicies() {
     try {
+        console.log('Loading policies from:', `${API_BASE_URL}/api/policies`);
         const response = await fetch(`${API_BASE_URL}/api/policies`);
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
         if (!response.ok) {
-            throw new Error('Failed to load policies');
+            throw new Error(`Failed to load policies: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
+        console.log('Received policies data:', data);
         policies = data.policies || [];
+        console.log('Parsed policies:', policies);
         
         // Update dropdown in claim form
         updatePolicyDropdown();
@@ -65,6 +71,7 @@ async function loadPolicies() {
         return policies;
     } catch (error) {
         console.error('Error loading policies:', error);
+        console.error('Error details:', error.message);
         return [];
     }
 }

@@ -22,6 +22,7 @@ from models import (
     PolicyIndexRequest, PolicyIndexResponse,
     DocumentExtractRequest, DocumentExtractResponse,
     ClaimAnalysisRequest, ClaimAnalysisResponse,
+    PolicyRenameRequest,
     CustomerData
 )
 from processors.document import DocumentProcessor
@@ -55,10 +56,10 @@ app = FastAPI(
 # Add CORS middleware for frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Frontend HTTP server
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Initialize processors
@@ -369,6 +370,71 @@ async def search_policy(
         
     except Exception as e:
         logger.error(f"Error searching policy: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/api/policies/{policy_id}/rename")
+async def rename_policy(policy_id: str, request: PolicyRenameRequest):
+    """
+    Rename a policy by updating metadata in Pinecone.
+    
+    Args:
+        policy_id: Policy to rename
+        request: PolicyRenameRequest with new policy name
+        
+    Returns:
+        Success message with update details
+    """
+    try:
+        new_name = request.policy_name.strip()
+        
+        # Check for XSS patterns
+        xss_patterns = ['<script', '</script', 'javascript:', 'onload=', 'onerror=']
+        if any(pattern in new_name.lower() for pattern in xss_patterns):
+            raise HTTPException(status_code=400, detail="Invalid characters in policy name")
+        
+        index = policy_indexer.index
+        
+        # Find all vectors with this policy_id
+        results = index.query(
+            vector=[0.0] * 384,
+            top_k=10000,
+            include_metadata=True,
+            filter={"policy_id": policy_id}
+        )
+        
+        if not results.matches:
+            raise HTTPException(status_code=404, detail=f"Policy {policy_id} not found")
+        
+        # Update metadata for all vectors (metadata-only update)
+        # We only need to update metadata, not the vector values
+        vectors_updated = 0
+        for match in results.matches:
+            updated_metadata = match.metadata.copy()
+            updated_metadata['policy_name'] = new_name
+            
+            # Update metadata only - Pinecone requires the full vector to upsert
+            # So we need to fetch and re-upsert with updated metadata
+            index.update(
+                id=match.id,
+                set_metadata=updated_metadata
+            )
+            vectors_updated += 1
+        
+        logger.info(f"Renamed policy {policy_id} to '{new_name}' ({vectors_updated} vectors updated)")
+        
+        return {
+            "success": True,
+            "message": f"Policy renamed to '{new_name}'",
+            "policy_id": policy_id,
+            "new_name": new_name,
+            "vectors_updated": vectors_updated
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error renaming policy: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

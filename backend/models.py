@@ -32,6 +32,11 @@ class ClaimAnalysisRequest(BaseModel):
     customer_id: str = Field(..., description="Customer ID for deductible tracking")
 
 
+class PolicyRenameRequest(BaseModel):
+    """Request to rename a policy."""
+    policy_name: str = Field(..., description="New policy name", min_length=1, max_length=200)
+
+
 # ============================================================================
 # RESPONSE MODELS - What our API returns to clients
 # ============================================================================

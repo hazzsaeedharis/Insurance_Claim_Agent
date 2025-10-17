@@ -12,6 +12,8 @@ import logging
 
 import PyPDF2
 import pdfplumber
+import pytesseract
+import pdf2image
 from groq import Groq
 import openai
 import google.generativeai as genai
@@ -103,7 +105,7 @@ class PolicyIndexer:
             logger.warning("No premium API key set. Using Groq only (limited features)")
     
     def extract_text_from_pdf(self, pdf_path: str) -> List[Dict[str, Any]]:
-        """Extract text from PDF with page information"""
+        """Extract text from PDF with page information, with OCR fallback"""
         pages = []
         
         # Try pdfplumber first (better for tables)
@@ -111,7 +113,7 @@ class PolicyIndexer:
             with pdfplumber.open(pdf_path) as pdf:
                 for i, page in enumerate(pdf.pages):
                     text = page.extract_text()
-                    if text:
+                    if text and text.strip():  # Check for non-empty text
                         pages.append({
                             "page_num": i + 1,
                             "text": text,
@@ -120,16 +122,38 @@ class PolicyIndexer:
         except Exception as e:
             logger.warning(f"pdfplumber failed, trying pypdf2: {e}")
             # Fallback to pypdf2
-            with open(pdf_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
-                for i, page in enumerate(reader.pages):
-                    text = page.extract_text()
-                    if text:
+            try:
+                with open(pdf_path, 'rb') as file:
+                    reader = PyPDF2.PdfReader(file)
+                    for i, page in enumerate(reader.pages):
+                        text = page.extract_text()
+                        if text and text.strip():
+                            pages.append({
+                                "page_num": i + 1,
+                                "text": text,
+                                "tables": []
+                            })
+            except Exception as e2:
+                logger.warning(f"pypdf2 also failed: {e2}")
+        
+        # If no text extracted, try OCR (for scanned PDFs)
+        if not pages:
+            logger.info("No text extracted, trying OCR for scanned PDF...")
+            try:
+                pdf_images = pdf2image.convert_from_path(pdf_path)
+                for i, img in enumerate(pdf_images):
+                    logger.info(f"OCR processing page {i+1}/{len(pdf_images)}")
+                    text = pytesseract.image_to_string(img, lang='deu+eng')
+                    if text and text.strip():
                         pages.append({
                             "page_num": i + 1,
                             "text": text,
                             "tables": []
                         })
+                logger.info(f"OCR extracted {len(pages)} pages")
+            except Exception as e:
+                logger.error(f"OCR failed: {e}")
+                logger.error("Make sure Tesseract OCR is installed and in PATH")
         
         return pages
     
