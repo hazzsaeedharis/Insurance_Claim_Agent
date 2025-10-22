@@ -73,7 +73,7 @@ def main():
     print_banner()
     
     # Check requirements
-    print("🔍 Checking requirements...")
+    print("[>] Checking requirements...")
     if not check_requirements():
         sys.exit(1)
     

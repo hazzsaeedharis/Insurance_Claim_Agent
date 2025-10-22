@@ -80,6 +80,26 @@ class Settings(BaseSettings):
     default_deductible: float = 50.0
     default_coverage_rate: float = 0.80  # 80% coverage
     
+    # ========================================================================
+    # AUTHENTICATION & SECURITY
+    # ========================================================================
+    # Database
+    database_url: str = "postgresql://postgres:postgres@localhost:5432/insurance_claims"
+    
+    # JWT Configuration
+    secret_key: str = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"  # Change in production!
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
+    
+    # Google OAuth2
+    google_client_id: Optional[str] = None
+    google_client_secret: Optional[str] = None
+    google_redirect_uri: str = "http://localhost:8000/auth/google/callback"
+    
+    # Frontend URL (for CORS and redirects)
+    frontend_url: str = "http://localhost:3000"
+    
     class Config:
         """Pydantic configuration."""
         env_file = ".env"
