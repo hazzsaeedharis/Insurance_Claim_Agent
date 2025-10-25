@@ -17,17 +17,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Internal imports
-from config import get_settings, validate_api_keys
-from models import (
+from backend.config import get_settings, validate_api_keys
+from backend.models import (
     PolicyIndexRequest, PolicyIndexResponse,
     DocumentExtractRequest, DocumentExtractResponse,
     ClaimAnalysisRequest, ClaimAnalysisResponse,
     PolicyRenameRequest,
     CustomerData
 )
-from processors.document import DocumentProcessor
-from processors.policy import PolicyIndexer
-from processors.claim import ClaimAnalyzer
+from backend.processors.document import DocumentProcessor
+from backend.processors.policy import PolicyIndexer
+from backend.processors.claim import ClaimAnalyzer
 
 
 # ============================================================================
