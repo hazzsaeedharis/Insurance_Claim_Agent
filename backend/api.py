@@ -12,9 +12,11 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 
 # Internal imports
 from backend.config import get_settings, validate_api_keys
@@ -56,11 +58,25 @@ app = FastAPI(
 # Add CORS middleware for frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Frontend HTTP server
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        settings.frontend_url,
+        "http://localhost:8000",  # For serving frontend from same origin
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
 )
+
+# Include authentication router
+app.include_router(auth_router)
+
+# Mount static files for frontend
+frontend_path = Path(__file__).parent.parent / "frontend"
+if frontend_path.exists():
+    app.mount("/frontend", StaticFiles(directory=str(frontend_path)), name="frontend")
+    logger.info(f"Frontend static files mounted from: {frontend_path}")
 
 # Initialize processors
 document_processor = DocumentProcessor()
@@ -135,7 +151,8 @@ async def get_status():
 async def index_policy(
     policy_id: Optional[str] = Form(None),
     policy_name: Optional[str] = Form(None),
-    files: List[UploadFile] = File(...)
+    files: List[UploadFile] = File(...),
+    current_user: DBUser = Depends(get_current_user)
 ):
     """
     Index insurance policy documents (supports multiple files).
@@ -249,7 +266,7 @@ async def index_policy(
 
 
 @app.get("/api/policies")
-async def list_policies():
+async def list_policies(current_user: DBUser = Depends(get_current_user)):
     """
     List all indexed policies.
     
@@ -294,7 +311,7 @@ async def list_policies():
 
 
 @app.delete("/api/policies/{policy_id}")
-async def delete_policy(policy_id: str):
+async def delete_policy(policy_id: str, current_user: DBUser = Depends(get_current_user)):
     """
     Delete a policy from the index.
     
@@ -341,7 +358,8 @@ async def delete_policy(policy_id: str):
 async def search_policy(
     policy_id: str,
     query: str,
-    limit: int = 5
+    limit: int = 5,
+    current_user: DBUser = Depends(get_current_user)
 ):
     """
     Search within a specific policy document.
@@ -374,7 +392,11 @@ async def search_policy(
 
 
 @app.patch("/api/policies/{policy_id}/rename")
-async def rename_policy(policy_id: str, request: PolicyRenameRequest):
+async def rename_policy(
+    policy_id: str,
+    request: PolicyRenameRequest,
+    current_user: DBUser = Depends(get_current_user)
+):
     """
     Rename a policy by updating metadata in Pinecone.
     
@@ -446,7 +468,8 @@ async def rename_policy(policy_id: str, request: PolicyRenameRequest):
 async def extract_document(
     claim_id: str = Form(...),
     document_type_hint: Optional[str] = Form(None),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user: DBUser = Depends(get_current_user)
 ):
     """
     Extract structured data from a claim document using AI.
@@ -535,7 +558,8 @@ async def extract_document(
 @app.post("/api/claims/analyze/{claim_id}", response_model=ClaimAnalysisResponse)
 async def analyze_claim(
     claim_id: str,
-    request: ClaimAnalysisRequest
+    request: ClaimAnalysisRequest,
+    current_user: DBUser = Depends(get_current_user)
 ):
     """
     Analyze a claim against policy terms and calculate reimbursement.
@@ -603,7 +627,7 @@ async def analyze_claim(
 
 
 @app.get("/api/claims/cache")
-async def get_cached_claims():
+async def get_cached_claims(current_user: DBUser = Depends(get_current_user)):
     """
     Get all cached claim extractions (for debugging/demo).
     
@@ -625,7 +649,7 @@ async def get_cached_claims():
 
 
 @app.delete("/api/claims/cache/{claim_id}")
-async def clear_claim_cache(claim_id: str):
+async def clear_claim_cache(claim_id: str, current_user: DBUser = Depends(get_current_user)):
     """
     Remove a claim from the cache.
     
@@ -673,6 +697,18 @@ async def general_exception_handler(request, exc):
 async def startup_event():
     """Initialize application on startup."""
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+    
+    # Initialize database
+    try:
+        logger.info("Initializing database...")
+        init_db()
+        if check_db_connection():
+            logger.info("Database connection successful")
+        else:
+            logger.warning("Database connection failed - authentication features may not work")
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}")
+        logger.warning("Continuing without database - authentication features will not work")
     
     # Validate configuration
     api_status = validate_api_keys()

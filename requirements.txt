@@ -28,3 +28,14 @@ python-dotenv
 aiofiles
 requests
 numpy
+
+# Authentication & Database
+sqlalchemy
+psycopg2-binary
+alembic
+pwdlib[argon2]
+python-jose[cryptography]
+authlib
+itsdangerous
+slowapi
+email-validator

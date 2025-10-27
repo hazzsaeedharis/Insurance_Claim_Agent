@@ -3,6 +3,237 @@ const API_BASE_URL = 'http://localhost:8000';
 
 // App State
 let policies = []; // Store loaded policies
+let currentUser = null; // Current authenticated user
+
+// ============================================================================
+// AUTHENTICATION FUNCTIONS
+// ============================================================================
+
+// Get access token from localStorage
+function getAccessToken() {
+    return localStorage.getItem('access_token');
+}
+
+// Check if user is authenticated
+function isAuthenticated() {
+    const token = getAccessToken();
+    const expiresAt = localStorage.getItem('token_expires_at');
+    
+    if (!token || !expiresAt) {
+        return false;
+    }
+    
+    // Check if token is expired
+    if (Date.now() >= parseInt(expiresAt)) {
+        // Try to refresh token
+        refreshAccessToken();
+        return false;
+    }
+    
+    return true;
+}
+
+// Refresh access token
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    
+    if (!refreshToken) {
+        logout();
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                refresh_token: refreshToken
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Token refresh failed');
+        }
+        
+        const data = await response.json();
+        
+        // Update tokens
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('token_expires_at', Date.now() + (data.expires_in * 1000));
+        
+        return data.access_token;
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        logout();
+    }
+}
+
+// Logout user
+async function logout() {
+    try {
+        const token = getAccessToken();
+        
+        if (token) {
+            await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                credentials: 'include'
+            });
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+    } finally {
+        // Clear local storage
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('token_expires_at');
+        
+        // Redirect to auth page
+        window.location.href = 'auth.html';
+    }
+}
+
+// Get current user info
+async function getCurrentUser() {
+    if (!isAuthenticated()) {
+        return null;
+    }
+    
+    try {
+        const token = getAccessToken();
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to get user info');
+        }
+        
+        const user = await response.json();
+        currentUser = user;
+        return user;
+    } catch (error) {
+        console.error('Get user error:', error);
+        return null;
+    }
+}
+
+// Make authenticated API request
+async function authenticatedFetch(url, options = {}) {
+    if (!isAuthenticated()) {
+        window.location.href = 'auth.html';
+        throw new Error('Not authenticated');
+    }
+    
+    const token = getAccessToken();
+    
+    // Add authorization header
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+    
+    // Add credentials
+    options.credentials = 'include';
+    
+    try {
+        const response = await fetch(url, options);
+        
+        // If unauthorized, try to refresh token
+        if (response.status === 401) {
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+                // Retry request with new token
+                options.headers['Authorization'] = `Bearer ${newToken}`;
+                return await fetch(url, options);
+            }
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('Authenticated fetch error:', error);
+        throw error;
+    }
+}
+
+// Update UI based on auth status
+async function updateAuthUI() {
+    const loginBtn = document.querySelector('.btn-login');
+    
+    if (isAuthenticated()) {
+        const user = await getCurrentUser();
+        
+        if (user) {
+            // Replace login button with user menu
+            loginBtn.innerHTML = `<i class="fas fa-user"></i> ${user.full_name || user.email}`;
+            loginBtn.onclick = () => {
+                if (confirm('Do you want to logout?')) {
+                    logout();
+                }
+            };
+        }
+    } else {
+        // Redirect to login for protected pages
+        // Allow access to home page only
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('auth.html') && !currentPath.includes('auth-callback.html')) {
+            // Check if user is trying to access protected features
+            const demoSection = document.getElementById('demo');
+            if (demoSection) {
+                // Add overlay to protected sections
+                const protectedSections = ['demo', 'policies'];
+                protectedSections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.style.position = 'relative';
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = `
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: rgba(255,255,255,0.95);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 1000;
+                            flex-direction: column;
+                            gap: 20px;
+                        `;
+                        overlay.innerHTML = `
+                            <h2 style="color: #333;">🔒 Authentication Required</h2>
+                            <p style="color: #666;">Please login to access this feature</p>
+                            <button onclick="window.location.href='auth.html'" style="
+                                padding: 15px 30px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                border-radius: 10px;
+                                font-size: 1.1rem;
+                                cursor: pointer;
+                            ">Login / Register</button>
+                        `;
+                        section.appendChild(overlay);
+                    }
+                });
+            }
+        }
+    }
+}
+
+// Initialize auth on page load
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+});
 
 // Smooth scroll function
 function scrollToSection(sectionId) {
@@ -14,29 +245,10 @@ function showDemo() {
     scrollToSection('demo');
 }
 
-// Login modal functions
+// Login - redirect to auth page
 function showLogin() {
-    document.getElementById('loginModal').classList.add('show');
+    window.location.href = 'auth.html';
 }
-
-function closeLogin() {
-    document.getElementById('loginModal').classList.remove('show');
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('loginModal');
-    if (event.target === modal) {
-        modal.classList.remove('show');
-    }
-}
-
-// Login form submission
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Login functionality would connect to Keycloak JWT authentication');
-    closeLogin();
-});
 
 // ============================================================================
 // POLICY MANAGEMENT FUNCTIONS
@@ -49,7 +261,7 @@ let selectedFiles = [];
 async function loadPolicies() {
     try {
         console.log('Loading policies from:', `${API_BASE_URL}/api/policies`);
-        const response = await fetch(`${API_BASE_URL}/api/policies`);
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/policies`);
         console.log('Response status:', response.status);
         console.log('Response headers:', response.headers);
         
@@ -295,7 +507,7 @@ if (document.getElementById('policyUploadForm')) {
             });
             
             // Upload to server
-            const uploadPromise = fetch(`${API_BASE_URL}/api/policies/index`, {
+            const uploadPromise = authenticatedFetch(`${API_BASE_URL}/api/policies/index`, {
                 method: 'POST',
                 body: formData
             });
@@ -376,7 +588,7 @@ async function renamePolicy(policyId) {
     
     try {
         // Update policy name via API
-        const response = await fetch(`${API_BASE_URL}/api/policies/${policyId}/rename`, {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/policies/${policyId}/rename`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -438,7 +650,7 @@ async function deletePolicy(policyId) {
     }
     
     try {
-        const response = await fetch(`${API_BASE_URL}/api/policies/${policyId}`, {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/policies/${policyId}`, {
             method: 'DELETE'
         });
         
@@ -545,7 +757,7 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
         formData.append('claim_id', claimId); // Use the same claim ID
         formData.append('document_type_hint', 'medical_invoice');
         
-        const extractResponse = await fetch(`${API_BASE_URL}/api/documents/extract`, {
+        const extractResponse = await authenticatedFetch(`${API_BASE_URL}/api/documents/extract`, {
             method: 'POST',
             body: formData
         });
@@ -569,7 +781,7 @@ async function processClaimWithRealAPI(file, policyNumber, startTime) {
             throw new Error('Please select a policy first');
         }
         
-        const analysisResponse = await fetch(`${API_BASE_URL}/api/claims/analyze/${claimId}`, { // Use the same claim ID
+        const analysisResponse = await authenticatedFetch(`${API_BASE_URL}/api/claims/analyze/${claimId}`, { // Use the same claim ID
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
